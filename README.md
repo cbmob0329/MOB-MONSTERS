@@ -1,6 +1,6 @@
-# MOB MONSTERS v0.1.0 CORE
+# MOB MONSTERS v0.2.0 UI
 
-MOB STORY / MOB QUEST の戦闘思想を土台にした、MOB MONSTERS の最初のプレイアブル・コアです。
+MOB STORY / MOB QUEST の戦闘思想を土台にした MOB MONSTERS v0.1 CORE を保持し、主要画面をスマホ縦画面向けに本番化した v0.2 UI ビルドです。
 
 ## 起動
 
@@ -15,6 +15,21 @@ python -m http.server 8000
 その後 `http://localhost:8000/` を開きます。
 
 GitHub Pages に置く場合も、そのまま静的サイトとして動く構成です。
+
+## v0.2 UIで追加・更新したもの
+
+- 専用ヘッダーとCSSアイコンの下部ナビ
+- HOMEメインビジュアルと現在ミッション表示
+- PARTY 4+2+4の役割別レイアウト
+- モンスター詳細（能力 / パッシブ / 耐性 / RECORD / 技）
+- STORYのSEASON / FLOOR / AREA進行UI
+- SOUL / RECORD / FUSION LABと融合誕生演出
+- ARENAランク進行カード
+- 戦闘HUD / ログ / コマンドのスマホ最適化
+- `assets/ui/` の背景PNG差し替えスロット
+- UIレンダー用 `tests/ui_runtime_smoke.js`
+
+ゲームデータとCOREルールはv0.1から変更せず、localStorageキー `mob_monsters_core_v001` も維持しています。
 
 ## この CORE に入っているもの
 
@@ -88,5 +103,7 @@ CORE TEST の初期10体、テストSOUL、テスト用所持アイテムは動�
 - `js/game.js` - セーブ、育成、戦闘、SOUL、FUSION、ストーリー、闘技場
 - `docs/CURRENT_SPEC.md` - 現行仕様の要約
 - `docs/IMPLEMENTATION_NOTES.md` - 実装上の確定/暫定/保留
+- `docs/UI_V02.md` - v0.2 UI更新範囲と画像差し替え仕様
 - `docs/MOB_MONSTERS_design_master_v08.xlsx` - 実装元データマスター
 - `tests/smoke.js` - データ整合性スモークテスト
+- `tests/ui_runtime_smoke.js` - 主要画面レンダーのランタイムスモークテスト

@@ -3,42 +3,44 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-  <meta name="theme-color" content="#17120d">
+  <meta name="theme-color" content="#0a1016">
+  <meta name="color-scheme" content="dark">
   <title>MOB MONSTERS</title>
-  <link rel="stylesheet" href="css/style.css?v=001">
+  <link rel="stylesheet" href="css/style.css?v=002">
 </head>
 <body>
   <div id="app" class="app-shell">
     <header class="topbar">
-      <button class="brand" data-go="home" type="button">
-        <b>MOB MONSTERS</b><small>SOUL & RECORD RPG</small>
+      <button class="brand" data-go="home" type="button" aria-label="HOMEへ戻る">
+        <span class="brand-mark" aria-hidden="true"><i></i></span>
+        <span class="brand-copy"><b>MOB MONSTERS</b><small>SOUL &amp; RECORD RPG</small></span>
       </button>
-      <div class="top-resources">
-        <span><small>G</small><b id="topGold">0</b></span>
-        <span><small>SOUL</small><b id="topSoul">0</b></span>
+      <div class="top-resources" aria-label="resources">
+        <span class="resource-chip"><small>G</small><b id="topGold">0</b></span>
+        <span class="resource-chip soul"><small>SOUL</small><b id="topSoul">0</b></span>
       </div>
     </header>
 
     <main id="screen" class="screen"></main>
 
     <nav class="bottom-nav" aria-label="main menu">
-      <button data-go="home" type="button"><i>⌂</i><span>HOME</span></button>
-      <button data-go="story" type="button"><i>◇</i><span>STORY</span></button>
-      <button data-go="party" type="button"><i>♟</i><span>PARTY</span></button>
-      <button data-go="soul" type="button"><i>◎</i><span>SOUL</span></button>
-      <button data-go="arena" type="button"><i>♜</i><span>ARENA</span></button>
+      <button data-go="home" type="button"><i class="nav-glyph nav-home" aria-hidden="true"></i><span>HOME</span></button>
+      <button data-go="story" type="button"><i class="nav-glyph nav-story" aria-hidden="true"></i><span>STORY</span></button>
+      <button data-go="party" type="button"><i class="nav-glyph nav-party" aria-hidden="true"></i><span>PARTY</span></button>
+      <button data-go="soul" type="button"><i class="nav-glyph nav-soul" aria-hidden="true"></i><span>SOUL</span></button>
+      <button data-go="arena" type="button"><i class="nav-glyph nav-arena" aria-hidden="true"></i><span>ARENA</span></button>
     </nav>
   </div>
 
   <div id="modal" class="modal" hidden>
-    <div class="modal-card">
-      <div class="modal-head"><b id="modalTitle">MENU</b><button id="modalClose" type="button">×</button></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-head"><b id="modalTitle">MENU</b><button id="modalClose" type="button" aria-label="閉じる">×</button></div>
       <div id="modalBody" class="modal-body"></div>
     </div>
   </div>
   <div id="toast" class="toast" hidden></div>
 
-  <script src="js/data.js?v=001"></script>
-  <script src="js/game.js?v=001"></script>
+  <script src="js/data.js?v=002"></script>
+  <script src="js/game.js?v=002"></script>
 </body>
 </html>
