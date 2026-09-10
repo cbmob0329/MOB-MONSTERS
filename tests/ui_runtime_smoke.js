@@ -2,6 +2,8 @@ const fs = require('fs');
 const vm = require('vm');
 const path = require('path');
 
+const assetsCode = fs.readFileSync(path.join(__dirname,'../js/assets.js'),'utf8');
+const assetMapCode = fs.readFileSync(path.join(__dirname,'../js/asset_map.js'),'utf8');
 const dataCode = fs.readFileSync(path.join(__dirname,'../js/data.js'),'utf8');
 const gameCode = fs.readFileSync(path.join(__dirname,'../js/game.js'),'utf8');
 
@@ -39,10 +41,12 @@ function runScreen(screen){
   context.window.window=context.window;
   context.window.document=document;
   vm.createContext(context);
+  vm.runInContext(assetsCode, context, {filename:'assets.js'});
+  vm.runInContext(assetMapCode, context, {filename:'asset_map.js'});
   vm.runInContext(dataCode, context, {filename:'data.js'});
   vm.runInContext(gameCode, context, {filename:'game.js'});
   if(!get('#screen').innerHTML) throw new Error(`${screen}: screen was not rendered`);
 }
 
 for(const s of ['home','story','party','monsters','soul','arena']) runScreen(s);
-console.log('MOB MONSTERS v0.2.1 UI runtime render smoke: OK');
+console.log('MOB MONSTERS v0.2.2 UI runtime render smoke: OK');

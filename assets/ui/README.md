@@ -1,10 +1,12 @@
-# MOB MONSTERS v0.2 UI image slots
+# Local UI assets
 
-v0.2 UI is complete without these images. Add/replace PNG files later without changing JavaScript.
+This folder now contains only MOB MONSTERS-local UI artwork such as the title logo and command icons.
 
-- `home_bg.png` — HOME main visual background, portrait/mobile crop recommended (e.g. 1080×1350 or larger)
-- `story_bg.png` — STORY header background
-- `battle_bg.png` — battle field background
+Runtime character, monster, field/background and technique artwork is resolved from the existing MOB QUEST GitHub repository by `js/assets.js` + `js/asset_map.js`.
 
-Monster images continue to use the relative paths already stored in `js/data.js` (for example `enemy/01.png`).
-If an image is missing, the UI displays the existing text/symbol fallback instead of breaking layout.
+Not used by MOB MONSTERS:
+- figure-family assets
+- weapon assets
+- armor assets
+
+Skill-family assets are used by battle techniques. Monster art uses `enemy/`, `boss/`, `spenemy/` and a small number of verified `play/` references.
