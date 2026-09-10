@@ -47,3 +47,7 @@ v0.1 COREのゲームロジック、データ、保存互換を維持したま�
 - `node tests/ui_runtime_smoke.js`
 
 `tests/smoke.js` は213体 / 30パッシブ / 120 RECORD / 固定FUSION 91 / RECORD FUSION 20 / SEASON 10 / 9エリアを検証する。
+
+
+## v0.2.1 REBUILD
+前回v0.2 UIは破棄。MOB QUEST v171をベンチマークにUI層を再構築。詳細は MOB_QUEST_V171_BENCHMARK.md を参照。

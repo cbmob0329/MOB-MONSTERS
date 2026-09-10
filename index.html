@@ -7,17 +7,20 @@
   <meta name="color-scheme" content="dark">
   <title>MOB MONSTERS</title>
   <link rel="stylesheet" href="css/style.css?v=002">
+  <link rel="stylesheet" href="css/ui_rebuild.css?v=021">
 </head>
 <body>
   <div id="app" class="app-shell">
     <header class="topbar">
       <button class="brand" data-go="home" type="button" aria-label="HOMEへ戻る">
-        <span class="brand-mark" aria-hidden="true"><i></i></span>
-        <span class="brand-copy"><b>MOB MONSTERS</b><small>SOUL &amp; RECORD RPG</small></span>
+        <img class="brand-logo-v3" src="assets/ui/logo_mob_monsters.svg" alt="MOB MONSTERS" onerror="this.classList.add('failed')">
+        <span class="brand-mark brand-fallback-v3" aria-hidden="true"><i></i></span>
+        <span class="brand-copy brand-copy-v3"><b>MOB MONSTERS</b><small>SOUL &amp; RECORD RPG</small></span>
       </button>
       <div class="top-resources" aria-label="resources">
         <span class="resource-chip"><small>G</small><b id="topGold">0</b></span>
         <span class="resource-chip soul"><small>SOUL</small><b id="topSoul">0</b></span>
+        <button id="systemBtn" class="system-btn-v4" type="button" aria-label="SYSTEM">⚙</button>
       </div>
     </header>
 
@@ -40,7 +43,7 @@
   </div>
   <div id="toast" class="toast" hidden></div>
 
-  <script src="js/data.js?v=002"></script>
-  <script src="js/game.js?v=002"></script>
+  <script src="js/data.js?v=021"></script>
+  <script src="js/game.js?v=021"></script>
 </body>
 </html>

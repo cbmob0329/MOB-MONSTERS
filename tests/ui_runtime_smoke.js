@@ -45,4 +45,4 @@ function runScreen(screen){
 }
 
 for(const s of ['home','story','party','monsters','soul','arena']) runScreen(s);
-console.log('MOB MONSTERS v0.2 UI runtime render smoke: OK');
+console.log('MOB MONSTERS v0.2.1 UI runtime render smoke: OK');
