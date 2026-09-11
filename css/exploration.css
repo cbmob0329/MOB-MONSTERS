@@ -114,3 +114,48 @@ to{transform:translateY(0);opacity:1}
 .explore-heading h1 span{display:inline-block}
 .explore-heading{gap:10px}
 
+/* Mobile: isolate the selector from the legacy fixed background layer. */
+.screen.expedition-select{isolation:isolate;background:#102630;padding:calc(88px + env(safe-area-inset-top,0px)) 12px calc(90px + env(safe-area-inset-bottom,0px));scroll-padding-top:90px}
+.screen.expedition-select:before,.screen.exploration-screen:before{display:none!important}
+.destination-list{position:relative;z-index:1;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.destination-list .destination{appearance:none;-webkit-appearance:none;position:relative;min-height:86px;min-width:0;width:100%;height:auto;opacity:1;visibility:visible;color:#f1f7eb;background-color:#28443e;border:1px solid #85a48a;padding:12px 9px;gap:9px;font-family:inherit}
+.destination-list .destination>span{font-size:19px}
+.destination-list .destination b{font-size:16px;white-space:normal;text-shadow:none;color:#f1f7eb}
+.destination-list .destination small{font-size:8px;color:#efd89e}
+.destination-list .destination em{font-size:18px}
+
+/* The page stays still. Only the 3 x 3 world translates inside the square viewport. */
+.screen.exploration-screen{inset:calc(78px + env(safe-area-inset-top,0px)) 0 calc(68px + env(safe-area-inset-bottom,0px));height:auto;min-height:0;padding:8px 12px!important;display:flex;flex-direction:column;gap:8px;overflow:hidden!important;background:#0d202a;isolation:isolate;touch-action:none}
+.exploration-screen .explore-heading{flex:none;margin:0;height:44px}
+.exploration-screen .explore-heading h1{font-size:19px}
+.field-slot{flex:1;min-height:0;min-width:0;display:grid;place-items:center;overflow:hidden}
+.field-map,.field-map.boss-map{flex:none;margin:0;box-sizing:border-box;max-width:100%;max-height:100%;background:var(--terrain);border-radius:12px}
+.field-world{position:absolute;left:0;top:0;width:calc(100% * var(--world-scale));height:calc(100% * var(--world-scale));will-change:transform;background:radial-gradient(ellipse at 20% 25%,#8ead4838,transparent 45%),repeating-linear-gradient(25deg,transparent 0 22px,#b4dc6f0a 23px 25px),var(--terrain);background-size:calc(100% / var(--world-scale)) calc(100% / var(--world-scale))}
+.field-world .field-road{background:repeating-linear-gradient(90deg,transparent 0 14%,#bca27430 16%,transparent 19%,transparent 33.333%)}
+.field-world .map-entity{width:calc(11% / var(--world-scale))}
+.field-world .map-entity.elite{width:calc(15% / var(--world-scale))}
+.field-world .map-entity.boss{width:33%}
+.field-world .map-entity.chest{width:calc(12% / var(--world-scale))}
+.field-world .map-entity.portal{width:calc(16% / var(--world-scale))}
+.boss-map .field-world .map-entity.portal{width:24%}
+.field-world .field-robot{width:calc(14% / var(--world-scale))}
+.map-sector{position:absolute;bottom:8px;left:10px;font-size:8px;letter-spacing:.1em;color:#e6eecb;background:#163728b8;padding:4px 6px;border-radius:4px;pointer-events:none}
+.exploration-screen .field-hint{flex:none;margin:0;height:18px;min-height:0;line-height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px}
+.exploration-screen .robo-console{flex:none;display:grid;grid-template-columns:minmax(0,1fr) 112px minmax(0,1fr);gap:6px;align-items:center;height:124px;box-sizing:border-box;padding:6px 8px;border-radius:18px}
+.joystick-guide{font-size:10px;line-height:1.8;text-align:center;color:#a8beb5;pointer-events:none}
+.joystick-pad{appearance:none;-webkit-appearance:none;position:relative;display:grid;place-items:center;width:112px!important;height:112px!important;min-width:0;padding:0;border-radius:50%;border:2px solid #6e8f86;background:radial-gradient(circle,#344e50 0 24%,#203839 25% 56%,#4f6963 57% 59%,#192d33 60%);box-shadow:inset 0 4px 10px #0008,0 2px 3px #0005;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+.joystick-pad:active{filter:none}
+.joystick-knob{display:block;width:48px;height:48px;border-radius:50%;border:2px solid #aec7b3;background:radial-gradient(circle at 35% 28%,#d0dcc7,#7c9b8b 50%,#385658);box-shadow:0 4px 8px #0008;pointer-events:none;will-change:transform}
+.exploration-screen .radar{justify-self:end;width:78px;height:78px;min-width:0;padding:2px;border-width:3px}
+.exploration-screen .radar b{font-size:10px;padding:2px;white-space:normal;line-height:1.4}
+.exploration-screen .radar small{font-size:6px}
+@media(max-height:600px){.screen.exploration-screen{gap:5px;padding:5px 10px!important}.exploration-screen .explore-heading{height:40px}.exploration-screen .robo-console{height:108px;grid-template-columns:minmax(0,1fr) 96px minmax(0,1fr)}.joystick-pad{width:96px!important;height:96px!important}.joystick-knob{width:42px;height:42px}}
+
+/* Keep the party in the foreground HUD and cap enemy art independently of count. */
+.battle-screen-v3 .enemy-stage-v3{height:30%;gap:6px}
+.battle-screen-v3 .enemy-unit-v3{max-width:120px;flex:1 1 0;min-width:0}
+.battle-screen-v3 .enemy-unit-v3.boss-size{max-width:174px}
+.battle-screen-v3 .enemy-art-v3{flex:none;width:100%;height:min(18dvh,112px);max-height:112px;overflow:hidden}
+.battle-screen-v3 .boss-size .enemy-art-v3{height:min(24dvh,165px);max-height:165px}
+.battle-screen-v3 .enemy-art-v3 img{width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 5px 3px #0008)}
+.battle-screen-v3 .enemy-nameplate-v3{margin-top:4px}

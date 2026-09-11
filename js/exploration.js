@@ -1,4 +1,4 @@
-/* Walking adventure. Coordinates are percentages of a square, independent of device size. */
+/* World units: 100 x 100 visible, 300 x 300 exploration, 100 x 100 boss arena. */
 (()=>{
 'use strict';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
@@ -8,15 +8,18 @@ const image=(src,alt='')=>`<img src="${src}" alt="${alt}" draggable="false">`;
 window.MOBMON_EXPLORATION=function(api){
   const {data:D,esc,ask,save,toast}=api;
   const areas=D.seasons.filter(s=>s.loop===1).flatMap(s=>s.areas);
-  let field=null,frame=0,last=0,keys=new Set(),direction='002',busy=false;
+  let field=null,frame=0,last=0,keys=new Set(),direction='002',busy=false,resizeObserver=null;
+  let stick={x:0,y:0,pointer:null};
+  const percent=n=>n/(field?.size||100)*100;
+  function resetStick(){stick={x:0,y:0,pointer:null};const knob=document.querySelector('#joystickKnob');if(knob)knob.style.transform='translate(0,0)';}
   function progress(){const s=api.state();return s.exploration||(s.exploration={cleared:{}});}
   const key=(area,deep)=>`${area}|${deep?'deep':'normal'}`;
   function cleared(area,deep){return !!progress().cleared[key(area,deep)]||!!api.state().story.completedAreas[`S${D.seasons.find(s=>s.loop===(deep?2:1)&&s.areas.includes(area)).season}|${area}`];}
   function deepUnlocked(){return areas.slice(0,areas.indexOf('魔王城')+1).every(a=>cleared(a,false));}
-  function stop(){cancelAnimationFrame(frame);frame=0;keys.clear();last=0;}
+  function stop(){cancelAnimationFrame(frame);frame=0;keys.clear();resetStick();last=0;resizeObserver?.disconnect();resizeObserver=null;}
   function leave(){stop();field=null;busy=false;}
   function selector(root){
-    stop();root.className='screen expedition-select';
+    stop();root.className='screen expedition-select';root.scrollTop=0;
     root.innerHTML=api.heading('冒険','CHOOSE YOUR DESTINATION')+`<p class="expedition-note">ロボに乗って、未知のソウルを探しに。<br>各エリアは AREA 1〜4。魔王城まで踏破すると深層が開放されます。</p><div class="destination-list">${areas.map((a,i)=>`<button data-destination="${i}" class="destination"><span>${String(i+1).padStart(2,'0')}</span><div><small>${cleared(a,false)?'CLEAR':'EXPLORE'}</small><b>${esc(a)}</b></div><em>›</em></button>`).join('')}</div>`;
     root.querySelectorAll('[data-destination]').forEach(b=>b.onclick=()=>{
       const a=areas[Number(b.dataset.destination)];api.modal(a,`<p>探索する深さを選んでください。</p><div class="depth-options"><button id="normalDepth" class="primary">${esc(a)}${cleared(a,false)?' ✓':''}</button><button id="deepDepth" class="primary" ${deepUnlocked()?'':'disabled'}>${esc(a)}深層${cleared(a,true)?' ✓':''}</button></div><p class="panel-note">${deepUnlocked()?'深層が開放されています。':'深層：草原から魔王城までのボスを倒すと開放'}</p>`);
@@ -31,42 +34,52 @@ window.MOBMON_EXPLORATION=function(api){
     await warp('ロボに乗って出発！',()=>{field=generate(area,deep,1);const s=api.state();s.screen='story';s.story.current={season:D.seasons.find(s=>s.loop===(deep?2:1)&&s.areas.includes(area)).season,area,floor:deep?2:1,areaNo:1};save();});
   }
   function pool(area,deep){const list=D.monsters.filter(m=>String(m.firstArea).startsWith(area)&&m.species!=='ボス'&&m.sourceCategory!=='event'&&(deep||D.rankOrder.indexOf(m.rank)<=5));return list.length?list:D.monsters.filter(m=>m.firstArea==='草原'&&m.species!=='ボス');}
-  function valid(f,p,r=4){return p.x>=r&&p.x<=100-r&&p.y>=r&&p.y<=100-r&&!f.obstacles.some(o=>distance(o,p)<o.r+r);}
-  function position(f,r=5){for(let i=0;i<400;i++){const p={x:8+Math.random()*84,y:12+Math.random()*70};if(valid(f,p,r)&&distance(p,f.player)>13&&f.entities.every(e=>distance(e,p)>r+5))return p;}return{x:50,y:25};}
-  function monster(f,kind='enemy',p=null){let m=choose(pool(f.area,f.deep));if(kind==='elite')m=f.area==='草原'?choose(D.monsters.filter(m=>['enemy/10.png','enemy/13.png'].includes(m.image))):choose(pool(f.area,f.deep).filter(m=>m.sourceCategory==='elite').length?pool(f.area,f.deep).filter(m=>m.sourceCategory==='elite'):pool(f.area,f.deep));if(kind==='boss')m=D.monsters.find(m=>m.name===D.areaBoss[f.area]?.[f.deep?'2':'1']);return{...p||position(f),id:crypto.randomUUID(),kind,name:m.name,src:m.image,angle:Math.random()*Math.PI*2,age:0};}
-  function chest(f,p){return{...p||position(f),id:crypto.randomUUID(),kind:'chest',rare:Math.random()<.1,opened:false,age:0};}
+  function valid(f,p,r=4){return p.x>=r&&p.x<=f.size-r&&p.y>=r&&p.y<=f.size-r&&!f.obstacles.some(o=>distance(o,p)<o.r+r);}
+  function position(f,r=5){for(let i=0;i<400;i++){const p={x:8+Math.random()*(f.size-16),y:12+Math.random()*(f.size-30)};if(valid(f,p,r)&&distance(p,f.player)>13&&f.entities.every(e=>distance(e,p)>r+5))return p;}return{x:f.size/2,y:40};}
+  function monster(f,kind='enemy',p=null){let m=choose(pool(f.area,f.deep));if(kind==='elite')m=f.area==='草原'?choose(D.monsters.filter(m=>['enemy/10.png','enemy/13.png'].includes(m.image))):choose(pool(f.area,f.deep).filter(m=>m.sourceCategory==='elite').length?pool(f.area,f.deep).filter(m=>m.sourceCategory==='elite'):pool(f.area,f.deep));if(kind==='boss')m=D.monsters.find(m=>m.name===D.areaBoss[f.area]?.[f.deep?'2':'1']);return{...p||position(f),id:globalThis.crypto?.randomUUID?.()||('entity_'+Date.now().toString(36)+Math.random().toString(36).slice(2)),kind,name:m.name,src:m.image,angle:Math.random()*Math.PI*2,age:0};}
+  function chest(f,p){return{...p||position(f),id:globalThis.crypto?.randomUUID?.()||('entity_'+Date.now().toString(36)+Math.random().toString(36).slice(2)),kind:'chest',rare:Math.random()<.1,opened:false,age:0};}
   function generate(area,deep,floor){
-    const f={area,deep,floor,player:{x:50,y:92},obstacles:[],entities:[],respawns:[],elapsed:0,portalPrompt:false};
+    const size=floor===4?100:300;
+    const f={area,deep,floor,size,camera:{x:0,y:0},player:{x:size/2,y:size-8},obstacles:[],entities:[],respawns:[],elapsed:0,portalPrompt:false};
     if(floor===4){if(!cleared(area,deep))f.entities.push(monster(f,'boss',{x:50,y:40}));else f.entities.push({id:'portal',kind:'portal',x:50,y:16,age:1});return f;}
     // Keep a connected central road and horizontal lanes; decorations never block these routes.
-    for(const y of [24,48,70])for(const x of [20,80]){const type=1+Math.floor(Math.random()*4),r=[0,5,6,9,6][type];f.obstacles.push({x:x+(Math.random()-.5)*8,y:y+(Math.random()-.5)*6,r,type});}
-    f.entities.push({id:'portal',kind:'portal',x:42+Math.random()*16,y:8,age:1});
+    for(let row=0;row<3;row++)for(let col=0;col<3;col++)for(const y of [28,68])for(const x of [22,78]){const type=1+Math.floor(Math.random()*4),r=[0,5,6,9,6][type];f.obstacles.push({x:col*100+x+(Math.random()-.5)*8,y:row*100+y+(Math.random()-.5)*6,r,type});}
+    f.entities.push({id:'portal',kind:'portal',x:142+Math.random()*16,y:8,age:1});
     if(floor===2)f.entities.push(monster(f,'elite',{x:f.entities[0].x,y:22}));
-    for(let i=0;i<(floor===2?6:7);i++)f.entities.push(monster(f));
+    // One nearby encounter invites movement; the others occupy separate parts of the world.
+    const sectors=[7,0,2,3,5,6,8];
+    for(let i=0;i<(floor===2?6:7);i++){const sector=sectors[i],e=monster(f);const p={x:(sector%3)*100+50+(Math.random()-.5)*10,y:Math.floor(sector/3)*100+48+(Math.random()-.5)*12};Object.assign(e,p);f.entities.push(e);}
     const count=1+(Math.random()<.5?1:0)+(Math.random()<.3?1:0);
     for(let i=0;i<count;i++)f.entities.push(chest(f));return f;
   }
   function target(){if(!field)return null;return field.entities.filter(e=>!e.opened&&distance(e,field.player)<(e.kind==='boss'?15:11)).sort((a,b)=>distance(a,field.player)-distance(b,field.player))[0]||null;}
-  function markup(e){const src=e.kind==='chest'?`takara/00${e.rare?(e.opened?4:3):(e.opened?2:1)}.png`:e.src;return `<div class="map-entity ${e.kind} ${e.opened?'opened':''}" data-entity="${e.id}" style="left:${e.x}%;top:${e.y}%">${e.kind==='portal'?'<span class="portal-vortex"></span>':image(src,e.name||'宝箱')}${e.kind==='elite'?'<small>中ボス</small>':e.kind==='boss'?'<small>BOSS</small>':''}</div>`;}
+  function markup(e){const src=e.kind==='chest'?`takara/00${e.rare?(e.opened?4:3):(e.opened?2:1)}.png`:e.src;return `<div class="map-entity ${e.kind} ${e.opened?'opened':''}" data-entity="${e.id}" style="left:${percent(e.x)}%;top:${percent(e.y)}%">${e.kind==='portal'?'<span class="portal-vortex"></span>':image(src,e.name||'宝箱')}${e.kind==='elite'?'<small>中ボス</small>':e.kind==='boss'?'<small>BOSS</small>':''}</div>`;}
   function render(root){
     if(!field)return selector(root);stop();const f=field;api.state().story.current.areaNo=f.floor;save();
     root.className='screen exploration-screen';
-    root.innerHTML=`<header class="explore-heading"><div><small>${f.deep?'DEEP EXPLORATION':'ROBO EXPEDITION'}</small><h1>${esc(f.area)}${f.deep?'深層':''} <span>AREA ${f.floor}/4</span></h1></div><button id="leaveField" class="ghost-btn">帰還</button></header><div class="field-map ${f.floor===4?'boss-map':''}" style="--terrain:${['#375e43','#776540','#576554','#344861','#24536c','#4c5640','#6b403a','#423c59','#435362'][areas.indexOf(f.area)]}" role="img" aria-label="${esc(f.area)}の探索マップ"><div class="field-road"></div><span class="map-north">N ↑</span>${f.obstacles.map(o=>`<div class="obstacle obstacle-${o.type}" style="left:${o.x}%;top:${o.y}%;width:${o.r*2+5}%">${image(`stage/00${o.type}.png`)}</div>`).join('')}<div id="fieldEntities">${f.entities.map(markup).join('')}</div><div id="fieldRobot" class="field-robot" style="left:50%;top:92%">${image(`robo/${direction}.png`,'操作ロボ')}</div></div><p class="field-hint" id="fieldHint" role="status">光る対象に近づいて、レーダーでアクション</p><div class="robo-console"><div class="dpad" aria-label="ロボの移動"><button data-direction="up" aria-label="上へ移動">▲</button><button data-direction="left" aria-label="左へ移動">◀</button><span>✦</span><button data-direction="right" aria-label="右へ移動">▶</button><button data-direction="down" aria-label="下へ移動">▼</button></div><button id="radarAction" class="radar" disabled><span class="radar-sweep"></span><b>探索中</b><small>RADAR</small></button></div><p class="console-note">方向キー / WASDでも移動 · Spaceでアクション</p>`;
+    root.scrollTop=0;
+    root.innerHTML=`<header class="explore-heading"><div><small>ROBO EXPEDITION</small><h1>${esc(f.area)}${f.deep?'深層':''} <span>AREA ${f.floor}/4</span></h1></div><button id="leaveField" class="ghost-btn">帰還</button></header><div class="field-slot"><div class="field-map ${f.floor===4?'boss-map':''}" style="--world-scale:${f.size/100};--terrain:${['#375e43','#776540','#576554','#344861','#24536c','#4c5640','#6b403a','#423c59','#435362'][areas.indexOf(f.area)]}" role="img" aria-label="${esc(f.area)}の探索マップ"><div id="fieldWorld" class="field-world"><div class="field-road"></div>${f.obstacles.map(o=>`<div class="obstacle obstacle-${o.type}" style="left:${percent(o.x)}%;top:${percent(o.y)}%;width:${percent(o.r*2+5)}%">${image(`stage/00${o.type}.png`)}</div>`).join('')}<div id="fieldEntities">${f.entities.map(markup).join('')}</div><div id="fieldRobot" class="field-robot">${image(`robo/${direction}.png`,'操作ロボ')}</div></div><span class="map-north">N ↑</span><span class="map-sector" id="mapSector"></span></div></div><p class="field-hint" id="fieldHint" role="status">近づくとレーダーが反応します</p><div class="robo-console"><span class="joystick-guide">ドラッグ<br>で移動</span><button id="joystickPad" class="joystick-pad" type="button" aria-label="バーチャルパッド：ドラッグして移動"><span id="joystickKnob" class="joystick-knob"></span></button><button id="radarAction" class="radar" disabled><span class="radar-sweep"></span><b>探索中</b><small>RADAR</small></button></div>`;
     root.querySelector('#leaveField').onclick=async()=>{if(await ask('エリアから帰還しますか？','現在の探索マップはリセットされます。獲得した報酬は保持されます。')){leave();api.go('home');}};
     root.querySelector('#radarAction').onclick=interact;
-    root.querySelectorAll('[data-direction]').forEach(b=>{b.onpointerdown=e=>{e.preventDefault();keys.add(b.dataset.direction);b.setPointerCapture(e.pointerId);};b.onpointerup=b.onpointercancel=b.onlostpointercapture=()=>keys.delete(b.dataset.direction);});
+    const pad=root.querySelector('#joystickPad');
+    const move=e=>{if(stick.pointer!==e.pointerId)return;e.preventDefault();const r=pad.getBoundingClientRect(),radius=r.width*.30;let x=(e.clientX-r.left-r.width/2)/radius,y=(e.clientY-r.top-r.height/2)/radius;const length=Math.hypot(x,y);if(length>1){x/=length;y/=length;}stick.x=Math.abs(x)<.12?0:x;stick.y=Math.abs(y)<.12?0:y;root.querySelector('#joystickKnob').style.transform=`translate(${x*radius}px,${y*radius}px)`;};
+    pad.onpointerdown=e=>{if(stick.pointer!==null||busy||!document.querySelector('#modal').hidden)return;stick.pointer=e.pointerId;pad.setPointerCapture(e.pointerId);move(e);};pad.onpointermove=move;
+    pad.onpointerup=pad.onpointercancel=pad.onlostpointercapture=e=>{if(stick.pointer===e.pointerId)resetStick();};
+    const slot=root.querySelector('.field-slot'),map=root.querySelector('.field-map');
+    const fit=()=>{const r=slot.getBoundingClientRect(),size=Math.max(1,Math.floor(Math.min(r.width,r.height)));map.style.width=size+'px';map.style.height=size+'px';};
+    fit();if(window.ResizeObserver){resizeObserver=new ResizeObserver(fit);resizeObserver.observe(slot);}
     draw();frame=requestAnimationFrame(tick);
   }
-  function draw(){if(!field)return;const root=document.querySelector('#screen'),robot=root.querySelector('#fieldRobot');if(!robot)return;robot.style.left=field.player.x+'%';robot.style.top=field.player.y+'%';const img=robot.querySelector('img');if(!img.getAttribute('src').endsWith(direction+'.png'))img.src=`robo/${direction}.png`;
-    const t=target();for(const e of field.entities){const el=root.querySelector(`[data-entity="${e.id}"]`);if(!el)continue;el.style.left=e.x+'%';el.style.top=e.y+'%';el.style.opacity=Math.min(1,e.age/.8);el.classList.toggle('in-range',e===t);}
+  function draw(){if(!field)return;const root=document.querySelector('#screen'),robot=root.querySelector('#fieldRobot');if(!robot)return;robot.style.left=percent(field.player.x)+'%';robot.style.top=percent(field.player.y)+'%';field.camera={x:clamp(field.player.x-50,0,field.size-100),y:clamp(field.player.y-50,0,field.size-100)};root.querySelector('#fieldWorld').style.transform=`translate(${-percent(field.camera.x)}%,${-percent(field.camera.y)}%)`;root.querySelector('#mapSector').textContent=field.floor===4?'BOSS AREA':`SECTOR ${Math.min(2,Math.floor(field.player.x/100))+1} / ${Math.min(2,Math.floor(field.player.y/100))+1}`;const img=robot.querySelector('img');if(!img.getAttribute('src').endsWith(direction+'.png'))img.src=`robo/${direction}.png`;
+    const t=target();for(const e of field.entities){const el=root.querySelector(`[data-entity="${e.id}"]`);if(!el)continue;el.style.left=percent(e.x)+'%';el.style.top=percent(e.y)+'%';el.style.opacity=Math.min(1,e.age/.8);el.classList.toggle('in-range',e===t);}
     const radar=root.querySelector('#radarAction');radar.disabled=!t||busy;radar.classList.toggle('detected',!!t);radar.querySelector('b').textContent=!t?'探索中':t.kind==='portal'?(field.floor===4?'エリアから出る':'次の階へ'):t.kind==='chest'?'開ける！':'バトル！';root.querySelector('#fieldHint').textContent=t?(t.name|| (t.kind==='chest'?'宝箱を発見！':'ワープホールを発見！')):'光る対象に近づいて、レーダーでアクション';
   }
-  function tick(now){if(!field)return;const dt=last?Math.min((now-last)/1000,.05):0;last=now;if(!busy&&document.querySelector('#modal').hidden&&!document.hidden){const f=field;f.elapsed+=dt;let dx=Number(keys.has('right'))-Number(keys.has('left')),dy=Number(keys.has('down'))-Number(keys.has('up'));if(dx||dy){direction=dy<0?'001':dy>0?'002':dx<0?'003':'004';const length=Math.hypot(dx,dy);dx=dx/length*dt*23;dy=dy/length*dt*23;const px={x:clamp(f.player.x+dx,4,96),y:f.player.y};if(valid(f,px,3))f.player.x=px.x;const py={x:f.player.x,y:clamp(f.player.y+dy,4,96)};if(valid(f,py,3))f.player.y=py.y;}
-      for(const e of f.entities){e.age+=dt;if(e.kind!=='enemy')continue;const next={x:e.x+Math.cos(e.angle)*dt*1.4,y:e.y+Math.sin(e.angle)*dt*1.4};if(valid(f,next,4)&&next.y<86){e.x=next.x;e.y=next.y;}else e.angle+=Math.PI*.7;}
+  function tick(now){if(!field)return;const dt=last?Math.min((now-last)/1000,.05):0;last=now;if(!busy&&document.querySelector('#modal').hidden&&!document.hidden){const f=field;f.elapsed+=dt;let dx=Number(keys.has('right'))-Number(keys.has('left'))+stick.x,dy=Number(keys.has('down'))-Number(keys.has('up'))+stick.y;if(dx||dy){direction=Math.abs(dy)>=Math.abs(dx)?(dy<0?'001':'002'):(dx<0?'003':'004');const length=Math.max(1,Math.hypot(dx,dy));dx=dx/length*dt*23;dy=dy/length*dt*23;const px={x:clamp(f.player.x+dx,4,f.size-4),y:f.player.y};if(valid(f,px,3))f.player.x=px.x;const py={x:f.player.x,y:clamp(f.player.y+dy,4,f.size-4)};if(valid(f,py,3))f.player.y=py.y;}
+      for(const e of f.entities){e.age+=dt;if(e.kind!=='enemy')continue;const next={x:e.x+Math.cos(e.angle)*dt*1.4,y:e.y+Math.sin(e.angle)*dt*1.4};if(valid(f,next,4)&&next.y<f.size-14){e.x=next.x;e.y=next.y;}else e.angle+=Math.PI*.7;}
       const ready=f.respawns.filter(t=>t<=f.elapsed);f.respawns=f.respawns.filter(t=>t>f.elapsed);for(const t of ready){const e=monster(f);f.entities.push(e);document.querySelector('#fieldEntities').insertAdjacentHTML('beforeend',markup(e));}
       draw();const portal=f.entities.find(e=>e.kind==='portal');if(portal&&distance(portal,f.player)<5&&!f.portalPrompt){f.portalPrompt=true;interact(portal);}if(portal&&distance(portal,f.player)>8)f.portalPrompt=false;
     }frame=requestAnimationFrame(tick);}
-  async function interact(explicit){if(busy||!field)return;const e=explicit?.kind?explicit:target();if(!e)return;keys.clear();
+  async function interact(explicit){if(busy||!field)return;const e=explicit?.kind?explicit:target();if(!e)return;keys.clear();resetStick();
     if(e.kind==='portal'){busy=true;const yes=await ask(field.floor===4?'エリアから出ますか？':'次の階に進みますか？',field.floor===4?'獲得したソウルと一緒に帰還します。':`AREA ${field.floor+1}へワープします。`);busy=false;if(!yes)return;if(field.floor===4){await warp('エリアから帰還！',()=>{leave();api.go('home');});}else await warp('次のAREAへ！',()=>{field=generate(field.area,field.deep,field.floor+1);});return;}
     if(e.kind==='chest'){if(e.opened)return;e.opened=true;const s=api.state(),item=e.rare?D.soulBoostItems[D.soulBoostItems.length-1]:D.soulBoostItems[0];s.inventory[item.id]=(s.inventory[item.id]||0)+1;save();document.querySelector(`[data-entity="${e.id}"]`).outerHTML=markup(e);draw();api.modal(e.rare?'RARE ITEM GET!':'ITEM GET!',`<div class="treasure-result ${e.rare?'rare':''}"><span class="treasure-rays"></span>${image(`takara/00${e.rare?4:2}.png`)}<span class="treasure-item">♫</span><h2>${esc(item.name)}</h2><p>×1 獲得しました！</p><button id="treasureDone" class="primary full">探索を続ける</button></div>`);document.querySelector('#treasureDone').onclick=api.close;return;}
     stop();busy=true;const f=field;const level=clamp(2+areas.indexOf(f.area)*6+(f.floor-1)*2+(f.deep?45:0),1,99);const roster=[{name:e.name,level:level+(e.kind==='boss'?2:0)}];if(e.kind==='enemy')for(let i=1,n=1+Math.floor(Math.random()*4);i<n;i++)roster.push({name:choose(pool(f.area,f.deep)).name,level});
@@ -77,7 +90,7 @@ window.MOBMON_EXPLORATION=function(api){
   }
   const keyNames={ArrowUp:'up',w:'up',ArrowDown:'down',s:'down',ArrowLeft:'left',a:'left',ArrowRight:'right',d:'right'};
   document.addEventListener('keydown',e=>{if(!field||busy||!document.querySelector('#modal').hidden)return;const k=keyNames[e.key];if(k){e.preventDefault();keys.add(k);}if(e.code==='Space'){e.preventDefault();interact();}});
-  document.addEventListener('keyup',e=>keys.delete(keyNames[e.key]));window.addEventListener('blur',()=>keys.clear());document.addEventListener('visibilitychange',()=>{keys.clear();last=0;});
+  document.addEventListener('keyup',e=>keys.delete(keyNames[e.key]));window.addEventListener('blur',()=>{keys.clear();resetStick();});document.addEventListener('visibilitychange',()=>{keys.clear();resetStick();last=0;});
   return{render,leave,stop,selector,generate,valid,deepUnlocked};
 };
 })();
