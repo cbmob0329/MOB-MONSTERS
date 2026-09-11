@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "checks": [
+    "cassette stats, fusion, conversion, persistence",
+    "carousel swipe selection and locks",
+    "arena no/yes, entrance, result and promotion clear",
+    "boss, main and super sprites, hidden reserves and history",
+    "skill playback and area effect center"
+  ],
+  "errors": []
+}
