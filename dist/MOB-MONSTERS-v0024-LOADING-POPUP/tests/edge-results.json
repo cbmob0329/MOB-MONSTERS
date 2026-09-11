@@ -1,0 +1,17 @@
+{
+  "result": "PASS",
+  "checks": [
+    "pointerDrag",
+    "tapAfterDrag",
+    "insufficientPoints",
+    "masterCap",
+    "exactTokenInheritance",
+    "inheritanceSelection",
+    "birthNo",
+    "areaSelection",
+    "bossBattle",
+    "battleRewardSP",
+    "returnFromBattle"
+  ],
+  "runtimeErrors": []
+}

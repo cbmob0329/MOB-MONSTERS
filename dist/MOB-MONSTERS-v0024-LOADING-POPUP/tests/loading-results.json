@@ -1,0 +1,17 @@
+{
+  "result": "PASS",
+  "popupWidths": [
+    320,
+    390
+  ],
+  "slowInitialReleaseMs": 3846,
+  "checks": [
+    "popupAboveBottom",
+    "lastButtonVisibleAndClickable",
+    "coldLoadDeadline",
+    "lateImagesAppear",
+    "cachedNoOverlay",
+    "offlineNoLock"
+  ],
+  "errors": []
+}

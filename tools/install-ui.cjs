@@ -42,4 +42,8 @@ s=s.replace("function monsterImage(m){return", "function monsterImage(m){if(m?.s
 s=s.replace('image:override,name:s.name','image:override,soulImage:override,name:s.name');
 s=s.replaceAll('esc(uiAssets.home)',"esc('../'+uiAssets.home)").replaceAll('esc(uiAssets.lab)',"esc('../'+uiAssets.lab)").replaceAll('esc(uiAssets.castle)',"esc('../'+uiAssets.castle)");
 s=s.replace("uiBusy=false;showModal('新しい仲間が誕生！'", "uiBusy=false;ui.fusion=[null,null];fusionV6($('#screen'));showModal('新しい仲間が誕生！'");
+s=s.replace("const VERSION='v0.2.3 HOME'", "const VERSION='v0.2.4 LOADING'");
+s=s.replace(">${sceneBgMarkup('home')}<div class=\"world-shade\">", '><div class="live-scene-bg-v5"></div><div class="world-shade">');
+s=s.replaceAll("${sceneBgMarkup('soul')}",'').replaceAll("${sceneBgMarkup('floor','魔王城',1)}",'');
+s=s.replace("assetImgMarkup(img,m?.name||'','mob-asset-img-v5')", "assetImgMarkup(img,m?.name||'','mob-asset-img-v5').replace('<img ', '<img loading=\"lazy\" ')");
 fs.writeFileSync('js/game.js',s);

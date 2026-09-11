@@ -1,0 +1,29 @@
+{
+  "result": "PASS",
+  "widths": [
+    320,
+    390,
+    430
+  ],
+  "checks": [
+    "home10",
+    "facilities",
+    "shop",
+    "gacha",
+    "story",
+    "arena",
+    "partySwap",
+    "scrollRetained",
+    "sortRetained",
+    "recordNo",
+    "recordYes",
+    "sevenSwitches",
+    "switchRestore",
+    "fusionCancel",
+    "silhouette",
+    "soulConsumption",
+    "birthTiming",
+    "birthParty"
+  ],
+  "runtimeErrors": []
+}
