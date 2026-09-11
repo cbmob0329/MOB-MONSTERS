@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "bossFusionPairs": 153,
+  "holdCount": 65,
+  "checks": [
+    "expedition navigation guard",
+    "accelerating hold, cancel and commit",
+    "boss self fusion",
+    "sticky enemy target across turns",
+    "all-target skill",
+    "ally inspection",
+    "4 mobile battle layouts",
+    "soul drop presentation"
+  ],
+  "errors": []
+}

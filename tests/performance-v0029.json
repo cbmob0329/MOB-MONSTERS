@@ -1,0 +1,27 @@
+{
+  "environment": "Edge 390x844 / 4x CPU throttle / 4 seconds movement / local asset responses / desktop emulation, not a real phone",
+  "before": {
+    "mutations": 7086,
+    "frames": 276,
+    "over33ms": 6,
+    "visibleObstacles": 72,
+    "totalObstacles": 72,
+    "playerY": 175.50100000000003,
+    "LayoutCount": 276,
+    "RecalcStyleCount": 277,
+    "TaskDuration": 2.604,
+    "ScriptDuration": 0.4214
+  },
+  "after": {
+    "mutations": 866,
+    "frames": 301,
+    "over33ms": 0,
+    "visibleObstacles": 11,
+    "totalObstacles": 72,
+    "playerY": 171.5980000000004,
+    "LayoutCount": 18,
+    "RecalcStyleCount": 301,
+    "TaskDuration": 0.9527,
+    "ScriptDuration": 0.2568
+  }
+}
