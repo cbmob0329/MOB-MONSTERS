@@ -159,3 +159,38 @@ to{transform:translateY(0);opacity:1}
 .battle-screen-v3 .boss-size .enemy-art-v3{height:min(24dvh,165px);max-height:165px}
 .battle-screen-v3 .enemy-art-v3 img{width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 5px 3px #0008)}
 .battle-screen-v3 .enemy-nameplate-v3{margin-top:4px}
+
+/* Game gestures: retain single-finger menu scrolling, suppress selection and zoom. */
+#app,#modal,#assetLoading,.encounter-overlay{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;touch-action:pan-y}
+#app *,#modal *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#app img,#modal img{-webkit-user-drag:none;user-drag:none}
+#app input,#app textarea,#modal input,#modal textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:text}
+#app input,#app select,#app textarea,#modal input,#modal select,#modal textarea{font-size:16px}
+.map-entity.enemy:before,.map-entity.elite:before,.map-entity.boss:before{content:'';position:absolute;left:17%;bottom:0;width:66%;height:15%;background:#091b1480;border-radius:50%;filter:blur(1px);pointer-events:none}
+.map-entity.enemy img,.map-entity.elite img,.map-entity.boss img{position:relative;transform:translateY(calc(-1 * var(--monster-hop,0%)));transform-origin:center bottom;will-change:transform}
+.map-entity[data-motion="rest"] img{transform:scale(1.025,.98)}
+
+/* One short approach beat, then a shutter into battle; no repeating flashes. */
+.encounter-overlay{position:fixed;z-index:190;inset:0;max-width:480px;margin:0 auto;overflow:hidden;isolation:isolate;display:grid;place-items:center;background:#091921e6;color:#fff3cf;touch-action:none;--encounter-accent:#9ff5d5;--encounter-deep:#225e58}
+.boss-encounter{--encounter-accent:#ffc09a;--encounter-deep:#762b3b;background:#210f20ed}
+.elite-encounter{--encounter-accent:#efd18b;--encounter-deep:#614b29}
+.encounter-speedlines{position:absolute;inset:-70%;z-index:-2;background:repeating-conic-gradient(from 12deg,transparent 0deg 14deg,var(--encounter-deep) 15deg 17deg,transparent 18deg 30deg);opacity:.75;animation:encounter-rush var(--encounter-duration) ease-out both}
+.encounter-ring{position:absolute;width:260px;height:260px;border:2px solid var(--encounter-accent);border-radius:50%;box-shadow:0 0 0 22px #9fe8cb0c,0 0 45px var(--encounter-deep);opacity:.5;animation:encounter-lock var(--encounter-duration) ease-out both}
+.encounter-banner{position:relative;width:100%;padding:25px 15px;text-align:center;background:linear-gradient(90deg,transparent,#061219d9 18% 82%,transparent);border-block:1px solid var(--encounter-accent);animation:encounter-banner-in var(--encounter-duration) cubic-bezier(.16,.8,.25,1) both}
+.encounter-banner>small{display:block;font-size:10px;font-weight:800;letter-spacing:.22em;color:var(--encounter-accent)}
+.encounter-portrait{height:140px;margin:12px auto 2px;filter:drop-shadow(0 0 16px var(--encounter-deep));animation:encounter-portrait-in var(--encounter-duration) ease-out both}
+.encounter-portrait img{display:block;width:100%;height:100%;object-fit:contain}
+.boss-encounter .encounter-portrait{height:185px}
+.encounter-banner h2{font-size:clamp(28px,9vw,43px);line-height:1.1;margin:10px 0;font-weight:1000;font-style:italic;letter-spacing:.03em;color:#fff3cf;text-shadow:0 3px 0 var(--encounter-deep)}
+.encounter-banner p{font-size:14px;margin:8px 0;color:#f5eddf}
+.encounter-banner>span{display:block;font-size:10px;letter-spacing:.1em;color:var(--encounter-accent);margin-top:16px}
+.encounter-cut{position:absolute;left:-10%;width:120%;height:18%;background:#040c14;border-bottom:2px solid var(--encounter-accent);transform:rotate(-10deg);animation:encounter-cut-in var(--encounter-duration) ease-out both}
+.encounter-cut.top{top:-9%}.encounter-cut.bottom{bottom:-9%;transform:rotate(-10deg) scaleY(-1)}
+.encounter-shutter{position:absolute;z-index:3;inset:0;background:#06111b;animation:encounter-shutter-close var(--encounter-duration) ease-in both}
+@keyframes encounter-rush{from{transform:scale(1.5) rotate(-14deg);opacity:0}30%{opacity:.8}to{transform:scale(.8) rotate(5deg);opacity:.6}}
+@keyframes encounter-lock{from{transform:scale(2.8);opacity:0}35%{transform:scale(1);opacity:.65}to{transform:scale(1.1);opacity:.3}}
+@keyframes encounter-banner-in{0%{transform:translateX(-110%)}25%,85%{transform:translateX(0)}100%{transform:translateX(8%)}}
+@keyframes encounter-portrait-in{0%,10%{transform:scale(.45);opacity:0}40%{transform:scale(1.08);opacity:1}70%,100%{transform:scale(1);opacity:1}}
+@keyframes encounter-cut-in{from{opacity:0}25%,100%{opacity:1}}
+@keyframes encounter-shutter-close{0%,78%{clip-path:inset(50% 0);opacity:0}80%{opacity:1}100%{clip-path:inset(0);opacity:1}}
+@media(prefers-reduced-motion:reduce){.encounter-overlay *{animation:none!important}.encounter-shutter{display:none}.encounter-speedlines{opacity:.2}.map-entity img{transform:none!important}}

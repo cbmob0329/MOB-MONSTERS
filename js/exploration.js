@@ -5,8 +5,10 @@ const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 const choose=a=>a[Math.floor(Math.random()*a.length)];
 const image=(src,alt='')=>`<img src="${src}" alt="${alt}" draggable="false">`;
+const ROBO_SPEED=30; // ~30% faster, still independent of frame rate and diagonal direction.
 window.MOBMON_EXPLORATION=function(api){
   const {data:D,esc,ask,save,toast}=api;
+  const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
   const areas=D.seasons.filter(s=>s.loop===1).flatMap(s=>s.areas);
   let field=null,frame=0,last=0,keys=new Set(),direction='002',busy=false,resizeObserver=null;
   let stick={x:0,y:0,pointer:null};
@@ -53,6 +55,26 @@ window.MOBMON_EXPLORATION=function(api){
     for(let i=0;i<count;i++)f.entities.push(chest(f));return f;
   }
   function target(){if(!field)return null;return field.entities.filter(e=>!e.opened&&distance(e,field.player)<(e.kind==='boss'?15:11)).sort((a,b)=>distance(a,field.player)-distance(b,field.player))[0]||null;}
+  function animateMonster(e,f,dt){
+    if(!['enemy','elite','boss'].includes(e.kind))return;
+    if(!e.motion){e.motion=Math.random()<.3?'rest':'hop';e.motionLeft=.8+Math.random()*2;e.hopPhase=Math.random();}
+    e.motionLeft-=dt;
+    if(e.motionLeft<=0){e.motion=e.motion==='rest'?(Math.random()<.7?'hop':'walk'):'rest';e.motionLeft=e.motion==='rest'?1+Math.random()*1.5:1.8+Math.random()*2;e.angle+=(Math.random()-.5)*2.2;e.hopPhase=0;}
+    if(e.motion==='hop')e.hopPhase=(e.hopPhase+dt/ .55)%1;
+    const bounce=e.motion==='hop'?Math.max(0,Math.sin(e.hopPhase*Math.PI)):0;
+    e.hop=reducedMotion.matches?0:bounce*(e.kind==='boss'?5:20);
+    if(e.kind!=='enemy'||e.motion==='rest')return;
+    const speed=e.motion==='hop'?2.2:1.4,next={x:e.x+Math.cos(e.angle)*dt*speed,y:e.y+Math.sin(e.angle)*dt*speed};
+    if(valid(f,next,4)&&next.y<f.size-14){e.x=next.x;e.y=next.y;}else{e.angle+=Math.PI*.7;e.motion='rest';e.motionLeft=.7;e.hop=0;}
+  }
+  async function encounter(e,roster){
+    const boss=e.kind==='boss',elite=e.kind==='elite',duration=reducedMotion.matches?400:boss?1650:1200;
+    const overlay=document.createElement('div');overlay.className=`encounter-overlay ${boss?'boss-encounter':elite?'elite-encounter':''}`;
+    overlay.style.setProperty('--encounter-duration',duration+'ms');overlay.setAttribute('role','status');overlay.setAttribute('aria-live','assertive');
+    overlay.innerHTML=`<div class="encounter-speedlines"></div><div class="encounter-ring"></div><div class="encounter-cut top"></div><div class="encounter-cut bottom"></div><section class="encounter-banner"><small>${boss?'WARNING · BOSS APPROACHING':elite?'WARNING · ELITE MONSTER':'ENEMY DETECTED'}</small><div class="encounter-portrait">${image(e.src,esc(e.name))}</div><h2>${boss?'BOSS BATTLE':elite?'強敵出現！':'ENCOUNTER'}</h2><p>${esc(e.name)}${roster.length>1?` ほか ${roster.length-1}体`:''}</p><span>ロボ、バトルモードへ！</span></section><div class="encounter-shutter"></div>`;
+    const app=document.querySelector('#app'),wasInert=app.inert;app.inert=true;api.lock(true);document.body.appendChild(overlay);
+    try{await new Promise(resolve=>setTimeout(resolve,duration));}finally{overlay.remove();app.inert=wasInert;api.lock(false);}
+  }
   function markup(e){const src=e.kind==='chest'?`takara/00${e.rare?(e.opened?4:3):(e.opened?2:1)}.png`:e.src;return `<div class="map-entity ${e.kind} ${e.opened?'opened':''}" data-entity="${e.id}" style="left:${percent(e.x)}%;top:${percent(e.y)}%">${e.kind==='portal'?'<span class="portal-vortex"></span>':image(src,e.name||'宝箱')}${e.kind==='elite'?'<small>中ボス</small>':e.kind==='boss'?'<small>BOSS</small>':''}</div>`;}
   function render(root){
     if(!field)return selector(root);stop();const f=field;api.state().story.current.areaNo=f.floor;save();
@@ -71,11 +93,11 @@ window.MOBMON_EXPLORATION=function(api){
     draw();frame=requestAnimationFrame(tick);
   }
   function draw(){if(!field)return;const root=document.querySelector('#screen'),robot=root.querySelector('#fieldRobot');if(!robot)return;robot.style.left=percent(field.player.x)+'%';robot.style.top=percent(field.player.y)+'%';field.camera={x:clamp(field.player.x-50,0,field.size-100),y:clamp(field.player.y-50,0,field.size-100)};root.querySelector('#fieldWorld').style.transform=`translate(${-percent(field.camera.x)}%,${-percent(field.camera.y)}%)`;root.querySelector('#mapSector').textContent=field.floor===4?'BOSS AREA':`SECTOR ${Math.min(2,Math.floor(field.player.x/100))+1} / ${Math.min(2,Math.floor(field.player.y/100))+1}`;const img=robot.querySelector('img');if(!img.getAttribute('src').endsWith(direction+'.png'))img.src=`robo/${direction}.png`;
-    const t=target();for(const e of field.entities){const el=root.querySelector(`[data-entity="${e.id}"]`);if(!el)continue;el.style.left=percent(e.x)+'%';el.style.top=percent(e.y)+'%';el.style.opacity=Math.min(1,e.age/.8);el.classList.toggle('in-range',e===t);}
+    const t=target();for(const e of field.entities){const el=root.querySelector(`[data-entity="${e.id}"]`);if(!el)continue;el.style.left=percent(e.x)+'%';el.style.top=percent(e.y)+'%';el.style.opacity=Math.min(1,e.age/.8);el.classList.toggle('in-range',e===t);el.style.setProperty('--monster-hop',(e.hop||0)+'%');el.dataset.motion=e.motion||'';}
     const radar=root.querySelector('#radarAction');radar.disabled=!t||busy;radar.classList.toggle('detected',!!t);radar.querySelector('b').textContent=!t?'探索中':t.kind==='portal'?(field.floor===4?'エリアから出る':'次の階へ'):t.kind==='chest'?'開ける！':'バトル！';root.querySelector('#fieldHint').textContent=t?(t.name|| (t.kind==='chest'?'宝箱を発見！':'ワープホールを発見！')):'光る対象に近づいて、レーダーでアクション';
   }
-  function tick(now){if(!field)return;const dt=last?Math.min((now-last)/1000,.05):0;last=now;if(!busy&&document.querySelector('#modal').hidden&&!document.hidden){const f=field;f.elapsed+=dt;let dx=Number(keys.has('right'))-Number(keys.has('left'))+stick.x,dy=Number(keys.has('down'))-Number(keys.has('up'))+stick.y;if(dx||dy){direction=Math.abs(dy)>=Math.abs(dx)?(dy<0?'001':'002'):(dx<0?'003':'004');const length=Math.max(1,Math.hypot(dx,dy));dx=dx/length*dt*23;dy=dy/length*dt*23;const px={x:clamp(f.player.x+dx,4,f.size-4),y:f.player.y};if(valid(f,px,3))f.player.x=px.x;const py={x:f.player.x,y:clamp(f.player.y+dy,4,f.size-4)};if(valid(f,py,3))f.player.y=py.y;}
-      for(const e of f.entities){e.age+=dt;if(e.kind!=='enemy')continue;const next={x:e.x+Math.cos(e.angle)*dt*1.4,y:e.y+Math.sin(e.angle)*dt*1.4};if(valid(f,next,4)&&next.y<f.size-14){e.x=next.x;e.y=next.y;}else e.angle+=Math.PI*.7;}
+  function tick(now){if(!field)return;const dt=last?Math.min((now-last)/1000,.05):0;last=now;if(!busy&&document.querySelector('#modal').hidden&&!document.hidden){const f=field;f.elapsed+=dt;let dx=Number(keys.has('right'))-Number(keys.has('left'))+stick.x,dy=Number(keys.has('down'))-Number(keys.has('up'))+stick.y;if(dx||dy){direction=Math.abs(dy)>=Math.abs(dx)?(dy<0?'001':'002'):(dx<0?'003':'004');const length=Math.max(1,Math.hypot(dx,dy));dx=dx/length*dt*ROBO_SPEED;dy=dy/length*dt*ROBO_SPEED;const px={x:clamp(f.player.x+dx,4,f.size-4),y:f.player.y};if(valid(f,px,3))f.player.x=px.x;const py={x:f.player.x,y:clamp(f.player.y+dy,4,f.size-4)};if(valid(f,py,3))f.player.y=py.y;}
+      for(const e of f.entities){e.age+=dt;animateMonster(e,f,dt);}
       const ready=f.respawns.filter(t=>t<=f.elapsed);f.respawns=f.respawns.filter(t=>t>f.elapsed);for(const t of ready){const e=monster(f);f.entities.push(e);document.querySelector('#fieldEntities').insertAdjacentHTML('beforeend',markup(e));}
       draw();const portal=f.entities.find(e=>e.kind==='portal');if(portal&&distance(portal,f.player)<5&&!f.portalPrompt){f.portalPrompt=true;interact(portal);}if(portal&&distance(portal,f.player)>8)f.portalPrompt=false;
     }frame=requestAnimationFrame(tick);}
@@ -83,6 +105,8 @@ window.MOBMON_EXPLORATION=function(api){
     if(e.kind==='portal'){busy=true;const yes=await ask(field.floor===4?'エリアから出ますか？':'次の階に進みますか？',field.floor===4?'獲得したソウルと一緒に帰還します。':`AREA ${field.floor+1}へワープします。`);busy=false;if(!yes)return;if(field.floor===4){await warp('エリアから帰還！',()=>{leave();api.go('home');});}else await warp('次のAREAへ！',()=>{field=generate(field.area,field.deep,field.floor+1);});return;}
     if(e.kind==='chest'){if(e.opened)return;e.opened=true;const s=api.state(),item=e.rare?D.soulBoostItems[D.soulBoostItems.length-1]:D.soulBoostItems[0];s.inventory[item.id]=(s.inventory[item.id]||0)+1;save();document.querySelector(`[data-entity="${e.id}"]`).outerHTML=markup(e);draw();api.modal(e.rare?'RARE ITEM GET!':'ITEM GET!',`<div class="treasure-result ${e.rare?'rare':''}"><span class="treasure-rays"></span>${image(`takara/00${e.rare?4:2}.png`)}<span class="treasure-item">♫</span><h2>${esc(item.name)}</h2><p>×1 獲得しました！</p><button id="treasureDone" class="primary full">探索を続ける</button></div>`);document.querySelector('#treasureDone').onclick=api.close;return;}
     stop();busy=true;const f=field;const level=clamp(2+areas.indexOf(f.area)*6+(f.floor-1)*2+(f.deep?45:0),1,99);const roster=[{name:e.name,level:level+(e.kind==='boss'?2:0)}];if(e.kind==='enemy')for(let i=1,n=1+Math.floor(Math.random()*4);i<n;i++)roster.push({name:choose(pool(f.area,f.deep)).name,level});
+    try{await encounter(e,roster);}catch(error){busy=false;render(document.querySelector('#screen'));toast('戦闘の準備をやり直してください');return;}
+    if(field!==f)return;
     api.battle({mode:'exploration',area:f.area,floor:f.floor,title:`${f.area}${f.deep?'深層':''} AREA ${f.floor}`,enemyRoster:roster,useFullParty:true,soulDrop:true,guaranteedSoul:e.kind==='boss'?e.name:null,onWin:()=>{if(e.kind==='boss'){progress().cleared[key(f.area,f.deep)]=true;api.complete(f.area,f.deep);save();}},onReturn:(win,fled)=>{
       busy=false;if(!win&&!fled){leave();return false;}if(win||e.kind==='enemy'){f.entities=f.entities.filter(x=>x.id!==e.id);if(e.kind==='enemy')f.respawns.push(f.elapsed+15);if(e.kind==='boss'){f.entities.push(chest(f,{x:33,y:22}),chest(f,{x:67,y:22}),{id:'portal',kind:'portal',x:50,y:12,age:1});}}
       return true;
