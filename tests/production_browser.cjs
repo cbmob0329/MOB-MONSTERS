@@ -1,0 +1,4 @@
+const {chromium}=require(process.env.PLAYWRIGHT_PATH||'C:/Users/CB-Me/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const fs=require('fs');const assert=require('assert/strict');
+(async()=>{fs.mkdirSync('tests/screenshots',{recursive:true});const browser=await chromium.launch({headless:true,channel:'msedge'});const page=await browser.newPage({viewport:{width:390,height:844},deviceScaleFactor:1,isMobile:true,hasTouch:true});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+await page.goto('http://127.0.0.1:4173');await page.getByText('ゲームを開始',{exact:true}).click();await page.waitForTimeout(2500);console.log((await page.locator('#screen').innerText()).slice(0,900));await page.screenshot({path:'tests/screenshots/01-home.png',fullPage:true});await browser.close();if(errors.length)throw Error(errors.join('\n'));})().catch(e=>{console.error(e);process.exitCode=1});

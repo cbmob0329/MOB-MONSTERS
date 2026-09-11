@@ -48,5 +48,5 @@ function runScreen(screen){
   if(!get('#screen').innerHTML) throw new Error(`${screen}: screen was not rendered`);
 }
 
-for(const s of ['home','story','party','monsters','soul','arena','settings','castle','shop','gacha']) runScreen(s);
-console.log('MOB MONSTERS v0.2.3 UI runtime render smoke: OK');
+for(const s of ['home','story','party','monsters','soul','arena']) runScreen(s);
+console.log('MOB MONSTERS v0.2.2 UI runtime render smoke: OK');

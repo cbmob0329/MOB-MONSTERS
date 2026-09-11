@@ -1,20 +1,4 @@
-# MOB MONSTERS v0.2.3 — HOME Production
-
-スマホ縦画面向けのHOME・パーティー編成・ソウルラボ・育成UIを更新したフル実装です。
-
-- HOMEに4メイン・2スーパーサブ・4控え。右側の5施設と、下部HOME／編成／設定。
-- 編成のタップ交換・長押し移動、5列一覧、4種類ソート、追加後のスクロール保持。
-- ソウルの個別選択・確認、未発見候補、継承選択、合体・誕生演出。
-- モンスター詳細からSP育成。設定に7種類のテストトグル。
-
-**導入・変更点・素材差し替え・検証・残課題は [v0.2.3リリース資料](docs/RELEASE_v0023.md) を参照してください。**
-
-フォルダー内を既存サイトへ丸ごとコピーして置き換えます。ビルド不要。`node tools/preview.cjs` でプレビューできます。
-セーブキーは `mob_monsters_core_v001` のままです。背景を同梱し、モンスター／技は既存GitHub素材を読み込みます。
-
----
-
-以下は引き継いだv0.2.2の履歴です。現行仕様は上記のリリース資料を優先してください。
+# MOB MONSTERS v0.2.2 — GitHub Assets
 
 This build replaces the v0.2.1 placeholder-background direction with live MOB QUEST GitHub artwork while preserving the MOB MONSTERS CORE data/save format.
 
