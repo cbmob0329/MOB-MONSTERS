@@ -5,7 +5,9 @@ const path = require('path');
 const assetsCode = fs.readFileSync(path.join(__dirname,'../js/assets.js'),'utf8');
 const assetMapCode = fs.readFileSync(path.join(__dirname,'../js/asset_map.js'),'utf8');
 const dataCode = fs.readFileSync(path.join(__dirname,'../js/data.js'),'utf8');
-const gameCode = fs.readFileSync(path.join(__dirname,'../js/game.js'),'utf8');
+// Title and NEW GAME/CONTINUE are covered by exploration_browser.cjs.
+// Bypass the title here to retain coverage of each existing screen renderer.
+const gameCode = fs.readFileSync(path.join(__dirname,'../js/game.js'),'utf8').replace('let titleActive=true;', 'let titleActive=false;');
 
 function makeElement(){
   const el = {

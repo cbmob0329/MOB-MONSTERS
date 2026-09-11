@@ -4,10 +4,11 @@
  */
 window.MOBMON_UI_ASSETS={
   loading:'', // Optional loading-screen background, relative to site root.
-  home:'assets/scenes/king1.png',
-  lab:'assets/scenes/maojo3.png',
+  home:'back/002.png',
+  lab:'back/003.png',
   castle:'assets/scenes/maojo3.png',
   lilith:'play/14.png',
   chibiLilith:'play/14.png',
+  merchant:'play/001.png', // Provisional Mob Mita art; replace when the dedicated image is specified.
   soulOverrides:{}
 };
