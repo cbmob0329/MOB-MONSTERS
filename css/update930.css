@@ -13,3 +13,6 @@
 .battle-v30 .enemy-unit-v3{height:100%}.battle-v30 .enemy-art-v3,.battle-v30 .boss-size .enemy-art-v3{max-height:calc(100% - 34px)!important}
 @media(max-height:700px){.battle-v30{--command-space:130px}.battle-v30 .enemy-stage-v3{height:20%}}
 .battle-portrait-v30[data-battle-target]{outline:2px solid #98d7c8;outline-offset:1px}
+
+/* Reserve allies announce their assistance without a permanent battle portrait. */
+.support-cutin-v31{position:absolute;z-index:35;left:5%;right:5%;top:40%;padding:13px 18px;border:1px solid #c5d9b799;border-left:4px solid #e7d49e;border-radius:4px 18px 18px 4px;background:linear-gradient(105deg,#143943f5,#172836f2);box-shadow:0 8px 24px #0005;pointer-events:none;text-align:left;animation:support-cutin-v31 var(--cutin-time,1100ms) ease both}.support-cutin-v31 small{display:block;color:#b2d7cd;font-size:9px;letter-spacing:.16em}.support-cutin-v31 b{display:block;color:#fff4d2;font-size:clamp(14px,4.5vw,20px);margin:5px 0;overflow-wrap:anywhere}.support-cutin-v31 strong{display:block;color:#d5f2ef;font-size:15px;overflow-wrap:anywhere}@keyframes support-cutin-v31{0%{opacity:0;transform:translateX(-18px)}16%,80%{opacity:1;transform:translateX(0)}100%{opacity:0;transform:translateX(12px)}}@media(prefers-reduced-motion:reduce){.support-cutin-v31{animation:none}}
