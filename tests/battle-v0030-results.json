@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "checks": [
+    "4 responsive square portrait layouts",
+    "main and super detail, ally targeting",
+    "sticky enemy selection and lethal attack",
+    "counter and poison defeats",
+    "unique defeat/reward registration",
+    "boss death, reserve entry, reduced motion"
+  ],
+  "errors": []
+}
