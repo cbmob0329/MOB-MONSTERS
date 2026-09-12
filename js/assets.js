@@ -13,7 +13,7 @@ function allowed(path){path=clean(path);return !!path&&!FORBIDDEN.test(path);}
 function candidates(path){
   path=clean(path);if(!allowed(path))return [];
   if(path.startsWith('battle/'))return [...new Set([path,...(path==='battle/sabaku1.png'?['battle/sabaku.png']:[]),...RAW_BASES.map(b=>b+path)])];
-  return [...RAW_BASES.map(b=>b+path),path];
+  return [path,...RAW_BASES.map(b=>b+path)];
 }
 function first(path){return resolved.get(clean(path))||candidates(path)[0]||'';}
 function loaded(img){const path=img?.dataset?.mobAsset;if(path)resolved.set(path,img.getAttribute('src'));img?.classList.remove('asset-waiting','failed');}

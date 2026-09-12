@@ -19,7 +19,7 @@ const REGION_SITES={
 };
 const ROBO_SPEED=30; // ~30% faster, still independent of frame rate and diagonal direction.
 window.MOBMON_EXPLORATION=function(api){
-  const {data:D,esc,ask,save,toast}=api;
+  const {data:D,esc,ask,save,toast}=api;const campaign=window.MOBMON_CAMPAIGN;
   const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
   const areas=D.seasons.filter(s=>s.loop===1).flatMap(s=>s.areas);
   let selectedArea=0,view=null,mainField=null,caveField=null;
@@ -31,18 +31,18 @@ window.MOBMON_EXPLORATION=function(api){
   function progress(){const s=api.state();return s.exploration||(s.exploration={cleared:{}});}
   const key=(area,deep)=>`${area}|${deep?'deep':'normal'}`;
   function cleared(area,deep){return !!progress().cleared[key(area,deep)]||!!api.state().story.completedAreas[`S${D.seasons.find(s=>s.loop===(deep?2:1)&&s.areas.includes(area)).season}|${area}`];}
-  function unlocked(area,deep=false){if(api.state().settings.testMode)return true;const season=D.seasons.find(s=>s.loop===(deep?2:1)&&s.areas.includes(area));return !!season&&(season.season===1||!!api.state().story.completedSeasons[season.season-1]);}
-  function deepUnlocked(){if(api.state().settings.testMode)return true;return areas.slice(0,areas.indexOf('魔王城')+1).every(a=>cleared(a,false));}
+  function unlocked(area,deep=false){return campaign.unlocked(area,deep,cleared,api.state().settings.testMode);}
+  function deepUnlocked(){return unlocked('草原',true);}
   function stop(){cancelAnimationFrame(frame);frame=0;keys.clear();resetStick();last=0;resizeObserver?.disconnect();resizeObserver=null;}
   function leave(){stop();field=null;mainField=null;caveField=null;busy=false;view=null;}
   function selector(root){
     stop();root.className='screen expedition-select';root.scrollTop=0;
-    root.innerHTML=api.heading('冒険','CHOOSE YOUR DESTINATION')+`<p class="expedition-note">左右にスワイプして行き先を選択。<br>仲間と一緒に、新しいソウルを探しに行こう。</p><div class="destination-carousel" aria-label="冒険エリア">${areas.map((a,i)=>`<button data-destination="${i}" class="destination-card ${i===selectedArea?'selected':''} ${unlocked(a)?'':'locked'}" aria-label="${esc(a)}${unlocked(a)?'':' 未開放'}" aria-disabled="${!unlocked(a)}">${window.MOBMON_ASSETS.markup(window.MOBMON_ASSET_MAP.battleAsset(a),a)}<span><small>SEASON ${D.seasons.find(s=>s.loop===1&&s.areas.includes(a)).season} / ${!unlocked(a)?'LOCKED':cleared(a,false)?'CLEAR':'EXPLORE'}</small><b>${esc(a)}</b></span>${unlocked(a)?'':'<em>未開放</em>'}</button>`).join('')}</div><div class="carousel-controls"><button id="areaPrevious" aria-label="前のエリア">‹</button><p id="areaCaption"></p><button id="areaNext" aria-label="次のエリア">›</button></div><p class="expedition-note">通常シーズンを進めると次の地域が開放されます。</p>`;
+    root.innerHTML=api.heading('冒険','CHOOSE YOUR DESTINATION')+`<p class="expedition-note">左右にスワイプして行き先を選択。<br>仲間と一緒に、新しいソウルを探しに行こう。</p><div class="destination-carousel" aria-label="冒険エリア">${areas.map((a,i)=>`<button data-destination="${i}" class="destination-card ${i===selectedArea?'selected':''} ${unlocked(a)||unlocked(a,true)?'':'locked'}" aria-label="${esc(a)}${unlocked(a)||unlocked(a,true)?'':' 未開放'}" aria-disabled="${!unlocked(a)&&!unlocked(a,true)}">${window.MOBMON_ASSETS.markup(window.MOBMON_ASSET_MAP.battleAsset(a),a)}<span><small>SEASON ${campaign.entry(a).season} / ${!unlocked(a)&&!unlocked(a,true)?'LOCKED':cleared(a,false)?'CLEAR':'EXPLORE'}</small><b>${esc(a)}</b></span>${unlocked(a)||unlocked(a,true)?'':'<em>未開放</em>'}</button>`).join('')}</div><div class="carousel-controls"><button id="areaPrevious" aria-label="前のエリア">‹</button><p id="areaCaption"></p><button id="areaNext" aria-label="次のエリア">›</button></div><p class="expedition-note">通常シーズンを進めると次の地域が開放されます。</p>`;
     const rail=root.querySelector('.destination-carousel'),cards=[...root.querySelectorAll('[data-destination]')];
     const update=()=>{if(root.querySelector('.destination-carousel')!==rail)return;const box=rail.getBoundingClientRect(),center=box.left+box.width/2;selectedArea=cards.reduce((best,c,i)=>Math.abs(c.getBoundingClientRect().left+c.offsetWidth/2-center)<Math.abs(cards[best].getBoundingClientRect().left+cards[best].offsetWidth/2-center)?i:best,0);cards.forEach((c,i)=>c.classList.toggle('selected',i===selectedArea));root.querySelector('#areaCaption').textContent=`${areas[selectedArea]} · ${selectedArea+1} / ${areas.length}`;root.querySelector('#areaPrevious').disabled=selectedArea===0;root.querySelector('#areaNext').disabled=selectedArea===cards.length-1;};
     const focus=(index,smooth=true)=>{const c=cards[clamp(index,0,cards.length-1)];rail.scrollTo({left:c.offsetLeft-rail.offsetLeft-(rail.clientWidth-c.offsetWidth)/2,behavior:smooth&&!reducedMotion.matches?'smooth':'auto'});};
     rail.addEventListener('scroll',update,{passive:true});root.querySelector('#areaPrevious').onclick=()=>focus(selectedArea-1);root.querySelector('#areaNext').onclick=()=>focus(selectedArea+1);requestAnimationFrame(()=>{focus(selectedArea,false);update();});
-    cards.forEach((b,i)=>b.onclick=()=>{if(!unlocked(areas[i]))return toast('前のシーズンをクリアすると開放されます');selectedArea=i;focus(i);const a=areas[i];api.modal(a,`<p>探索する深さを選んでください。</p><div class="depth-options"><button id="normalDepth" class="primary">${esc(a)}${cleared(a,false)?' ✓':''}</button><button id="deepDepth" class="primary" ${unlocked(a,true)?'':'disabled'}>${esc(a)}深層${cleared(a,true)?' ✓':''}</button></div><p class="panel-note">${unlocked(a,true)?'深層へ出発できます。':'深層は対応するシーズンの開放が必要です。'}</p>`);document.querySelector('#normalDepth').onclick=()=>depart(a,false);document.querySelector('#deepDepth').onclick=()=>depart(a,true);});
+    cards.forEach((b,i)=>b.onclick=()=>{if(!unlocked(areas[i])&&!unlocked(areas[i],true))return toast('前のシーズンをクリアすると開放されます');selectedArea=i;focus(i);const a=areas[i];api.modal(a,`<p>探索する深さを選んでください。</p><div class="depth-options"><button id="normalDepth" class="primary" ${unlocked(a)?'':'disabled'}>${esc(a)}${cleared(a,false)?' ✓':''}</button><button id="deepDepth" class="primary" ${unlocked(a,true)?'':'disabled'}>${esc(a)}深層${cleared(a,true)?' ✓':''}</button></div><p class="panel-note">${unlocked(a,true)?'深層へ出発できます。':'深層は対応するシーズンの開放が必要です。'}</p>`);document.querySelector('#normalDepth').onclick=()=>depart(a,false);document.querySelector('#deepDepth').onclick=()=>depart(a,true);});
   }
 
   async function warp(label,fn,paths=[]){busy=true;stop();api.lock(true);try{await window.MOBMON_PRESENT.transition(label,paths,()=>{api.lock(false);fn();if(field)render(document.querySelector('#screen'));});}finally{api.lock(false);api.close();busy=false;}}
@@ -51,7 +51,7 @@ window.MOBMON_EXPLORATION=function(api){
     if(!api.party().length)return toast('先にパーティーに仲間を編成してください');
     if(!await ask(`${area}${deep?'深層':''}へ出発しますか？`,'ロボに乗って探索します。'))return;
     const next=generate(area,deep,1);
-    await warp('ロボに乗って出発！',()=>{mainField=null;caveField=null;field=next;const s=api.state();s.screen='story';s.story.current={season:D.seasons.find(s=>s.loop===(deep?2:1)&&s.areas.includes(area)).season,area,floor:deep?2:1,areaNo:1};save();},fieldAssets(next));
+    await warp('ロボに乗って出発！',()=>{mainField=null;caveField=null;field=next;const s=api.state();s.screen='story';s.story.current={season:campaign.entry(area,deep).season,area,floor:deep?2:1,areaNo:1};save();},fieldAssets(next));
   }
   function fieldAssets(f){return ['robo/001.png','robo/002.png','robo/003.png','robo/004.png',...f.obstacles.map(o=>'stage/00'+o.type+'.png'),...f.entities.map(e=>e.src).filter(Boolean),'takara/001.png','takara/002.png','takara/003.png','takara/004.png'];}
   function site(area){return REGION_SITES[area];}
@@ -68,7 +68,7 @@ window.MOBMON_EXPLORATION=function(api){
   function valid(f,p,r=4){return p.x>=r&&p.x<=f.size-r&&p.y>=r&&p.y<=f.size-r&&!(f.walls||[]).some(w=>hitsWall(w,p,r))&&!f.obstacles.some(o=>Math.abs(o.x-p.x)<o.r+r&&Math.abs(o.y-p.y)<o.r+r&&(o.x-p.x)**2+(o.y-p.y)**2<(o.r+r)**2);}
   function fixedWalls(area){const n=Math.max(0,areas.indexOf(area)),offset=(n%3)*5;return [{x:43+offset,y:52,size:38},{x:248-offset,y:62,size:42},{x:48,y:162+offset,size:44},{x:247,y:157-offset,size:38},{x:47+offset,y:245,size:40},{x:247-offset,y:245,size:42}];}
   function position(f,r=5){for(let i=0;i<400;i++){const p={x:8+Math.random()*(f.size-16),y:12+Math.random()*(f.size-30)};if(valid(f,p,r)&&distance(p,f.player)>13&&f.entities.every(e=>distance(e,p)>r+5))return p;}for(let y=8;y<f.size-8;y+=8)for(let x=8;x<f.size-8;x+=8){const p={x,y};if(valid(f,p,r)&&distance(p,f.player)>13&&f.entities.every(e=>distance(e,p)>r+5))return p;}throw new Error("探索マップに配置できる空間がありません");}
-  function monster(f,kind='enemy',p=null){let m=choose(pool(f.area,f.deep,f.inside));if(kind==='elite')m=f.area==='草原'?choose(D.monsters.filter(m=>['enemy/10.png','enemy/13.png'].includes(m.image))):choose(elitePool(f.area).length?elitePool(f.area):pool(f.area,f.deep));if(kind==='boss')m=D.monsters.find(m=>m.name===D.areaBoss[f.area]?.[f.deep?'2':'1']);return{...p||position(f),id:globalThis.crypto?.randomUUID?.()||('entity_'+Date.now().toString(36)+Math.random().toString(36).slice(2)),kind,name:m.name,src:m.image,angle:Math.random()*Math.PI*2,age:0};}
+  function monster(f,kind='enemy',p=null){let m=choose(pool(f.area,f.deep,f.inside));if(kind==='elite')m=f.area==='草原'?choose(D.monsters.filter(m=>['enemy/10.png','enemy/13.png'].includes(m.image))):choose(elitePool(f.area).length?elitePool(f.area):pool(f.area,f.deep));if(kind==='boss')m=D.monsters.find(m=>m.name===D.areaBoss[f.area]?.[f.deep?'2':'1']);return{...p||position(f),id:globalThis.crypto?.randomUUID?.()||('entity_'+Date.now().toString(36)+Math.random().toString(36).slice(2)),kind,level:campaign.level(f.area,f.deep,f.floor,kind,f.inside),name:m.name,src:m.image,angle:Math.random()*Math.PI*2,age:0};}
   function chest(f,p){return{...p||position(f),id:globalThis.crypto?.randomUUID?.()||('entity_'+Date.now().toString(36)+Math.random().toString(36).slice(2)),kind:'chest',rare:Math.random()<.1,opened:false,age:0};}
   function generate(area,deep,floor){
     const size=floor===4?100:300;
@@ -87,7 +87,7 @@ window.MOBMON_EXPLORATION=function(api){
     // Clear the complete visual footprint, not just the obstacle collision circle.
     f.obstacles=f.obstacles.filter(o=>!f.walls.some(w=>hitsWall(w,o,o.r+7))&&distance(o,site(area).entrance)>o.r+14);
     f.entities.push({id:'portal',kind:'portal',x:150,y:8,age:1});
-    if(floor===1)f.entities.push({id:'cave-entry',kind:'cave',...site(area).entrance,name:site(area).name,age:1});
+    if(floor<=3)f.entities.push({id:'cave-entry',kind:'cave',...site(area).entrance,name:site(area).name,age:1});
     if(floor===2)f.entities.push(monster(f,'elite',{x:f.entities[0].x,y:22}));
     // One nearby encounter invites movement; the others occupy separate parts of the world.
     const sectors=[7,0,2,3,5,6,8];
@@ -95,8 +95,8 @@ window.MOBMON_EXPLORATION=function(api){
     const count=1+(Math.random()<.5?1:0)+(Math.random()<.3?1:0);
     for(let i=0;i<count;i++)f.entities.push(chest(f));return f;
   }
-  function generateCave(area,deep){
-    const f={area,deep,floor:1,inside:true,size:150,camera:{x:0,y:0},player:{x:75,y:136},walls:[],obstacles:[],entities:[],respawns:[],elapsed:0,portalPrompt:false};
+  function generateCave(area,deep,floor=1){
+    const f={area,deep,floor,inside:true,size:150,camera:{x:0,y:0},player:{x:75,y:136},walls:[],obstacles:[],entities:[],respawns:[],elapsed:0,portalPrompt:false};
     for(const [x,y,r] of [[25,28,7],[42,38,5],[112,28,8],[125,50,5],[26,82,7],[45,107,5],[113,88,7],[125,119,5]])f.obstacles.push({x,y,r,type:1});
     f.entities.push({id:'cave-exit',kind:'cave-exit',x:75,y:144,name:'外へ戻る',age:1});
     f.entities.push(chest(f,{x:75,y:23}),chest(f,{x:105,y:60}));
@@ -125,7 +125,7 @@ window.MOBMON_EXPLORATION=function(api){
     const app=document.querySelector('#app'),wasInert=app.inert;app.inert=true;api.lock(true);document.body.appendChild(overlay);
     try{await new Promise(resolve=>setTimeout(resolve,duration));}finally{overlay.remove();app.inert=wasInert;api.lock(false);}
   }
-  function markup(e){const src=e.kind==='chest'?`takara/00${e.rare?(e.opened?4:3):(e.opened?2:1)}.png`:e.src;return `<div class="map-entity ${e.kind} ${e.opened?'opened':''}" data-entity="${e.id}" style="left:${percent(e.x)}%;top:${percent(e.y)}%">${e.kind==='portal'?'<span class="portal-vortex"></span>':e.kind==='cave'||e.kind==='cave-exit'?`<span class="cave-mouth"><i></i></span><small>${esc(e.name)}</small>`:image(src,e.name||'宝箱')}${e.kind==='elite'?'<small>中ボス</small>':e.kind==='boss'?'<small>BOSS</small>':''}</div>`;}
+  function markup(e){const src=e.kind==='chest'?`takara/00${e.rare?(e.opened?4:3):(e.opened?2:1)}.png`:e.src;return `<div class="map-entity ${e.kind} ${e.opened?'opened':''}" data-entity="${e.id}" style="left:${percent(e.x)}%;top:${percent(e.y)}%">${e.kind==='portal'?'<span class="portal-vortex"></span>':e.kind==='cave'||e.kind==='cave-exit'?`<span class="cave-mouth"><i></i></span><small>${esc(e.name)}</small>`:image(src,e.name||'宝箱')}${e.level?`<span class="field-nameplate">${esc(e.name)}<b>Lv ${e.level}${e.kind==='elite'?' · 中ボス':e.kind==='boss'?' · BOSS':''}</b></span>`:''}</div>`;}
   function render(root){
     if(!field)return selector(root);stop();const f=field;api.state().story.current.areaNo=f.floor;save();
     root.className='screen exploration-screen';
@@ -167,15 +167,15 @@ window.MOBMON_EXPLORATION=function(api){
     if(e.kind==='cave'||e.kind==='cave-exit'){
       const entering=e.kind==='cave';busy=true;
       const yes=await ask(entering?site(field.area).name+'へ入りますか？':'外へ戻りますか？','宝箱の取得状態は、この地域から帰還するまで保持されます。');busy=false;if(!yes)return;
-      if(entering){mainField=field;caveField=caveField||generateCave(field.area,field.deep);caveField.player={x:75,y:132};await warp(site(field.area).name+'へ',()=>{field=caveField;},fieldAssets(caveField));}
+      if(entering){mainField=field;caveField=caveField||generateCave(field.area,field.deep,field.floor);caveField.player={x:75,y:132};await warp(site(field.area).name+'へ',()=>{field=caveField;},fieldAssets(caveField));}
       else{await warp('外のエリアへ',()=>{field=mainField;},fieldAssets(mainField));}return;
     }
-    if(e.kind==='portal'){busy=true;const yes=await ask(field.floor===4?'エリアから出ますか？':'次の階に進みますか？',field.floor===4?'獲得したソウルと一緒に帰還します。':`AREA ${field.floor+1}へワープします。`);busy=false;if(!yes)return;if(field.floor===4){await warp('エリアから帰還！',()=>{leave();api.go('home');});}else {const next=generate(field.area,field.deep,field.floor+1);await warp('次のAREAへ！',()=>{field=next;},fieldAssets(next));}return;}
+    if(e.kind==='portal'){busy=true;const yes=await ask(field.floor===4?'エリアから出ますか？':'次の階に進みますか？',field.floor===4?'獲得したソウルと一緒に帰還します。':`AREA ${field.floor+1}へワープします。`);busy=false;if(!yes)return;if(field.floor===4){await warp('エリアから帰還！',()=>{leave();api.go('home');});}else {const next=generate(field.area,field.deep,field.floor+1);await warp('次のAREAへ！',()=>{mainField=null;caveField=null;field=next;},fieldAssets(next));}return;}
     if(e.kind==='chest'){if(e.opened)return;e.opened=true;const s=api.state(),item=e.rare?D.soulBoostItems[D.soulBoostItems.length-1]:D.soulBoostItems[0];s.inventory[item.id]=(s.inventory[item.id]||0)+1;save();document.querySelector(`[data-entity="${e.id}"]`).outerHTML=markup(e);draw();api.modal(e.rare?'RARE ITEM GET!':'ITEM GET!',`<div class="treasure-result ${e.rare?'rare':''}"><span class="treasure-rays"></span>${image(`takara/00${e.rare?4:2}.png`)}<span class="treasure-item">♫</span><h2>${esc(item.name)}</h2><p>×1 獲得しました！</p><button id="treasureDone" class="primary full">探索を続ける</button></div>`);document.querySelector('#treasureDone').onclick=api.close;return;}
-    stop();busy=true;const f=field;const level=clamp(2+areas.indexOf(f.area)*6+(f.floor-1)*2+(f.deep?45:0),1,99);const roster=[{name:e.name,level:level+(e.kind==='boss'?2:0)}];if(e.kind==='enemy')for(let i=1,n=1+Math.floor(Math.random()*4);i<n;i++)roster.push({name:choose(pool(f.area,f.deep,f.inside)).name,level});
+    stop();busy=true;const f=field;const roster=[{name:e.name,level:e.level}];if(e.kind==='enemy')for(let i=1,n=1+Math.floor(Math.random()*4);i<n;i++)roster.push({name:choose(pool(f.area,f.deep,f.inside)).name,level:campaign.level(f.area,f.deep,f.floor,'enemy',f.inside)});
     try{await encounter(e,roster);}catch(error){busy=false;render(document.querySelector('#screen'));toast('戦闘の準備をやり直してください');return;}
     if(field!==f)return;
-    api.battle({mode:'exploration',encounterKind:e.kind,background:window.MOBMON_ASSET_MAP.battleAsset(f.area,e.kind),area:f.area,floor:f.floor,title:`${f.area}${f.deep?'深層':''} ${f.inside?site(f.area).name:'AREA '+f.floor}`,enemyRoster:roster,useFullParty:true,soulDrop:true,guaranteedSoul:e.kind==='boss'?e.name:null,onWin:()=>{if(e.kind==='boss'){progress().cleared[key(f.area,f.deep)]=true;api.complete(f.area,f.deep);save();}},onReturn:(win,fled)=>{
+    api.battle({mode:'exploration',encounterKind:e.kind,background:window.MOBMON_ASSET_MAP.battleAsset(f.area,e.kind),area:f.area,floor:f.floor,title:`${f.area}${f.deep?'深層':''} ${f.inside?site(f.area).name:'AREA '+f.floor}`,enemyRoster:roster,useFullParty:true,soulDrop:true,guaranteedSoul:e.kind==='boss'?e.name:null,onWin:()=>{if(e.kind==='elite'){(api.state().quests||={}).eliteGrass=api.state().quests.eliteGrass||f.area==='草原';save();}if(e.kind==='boss'){progress().cleared[key(f.area,f.deep)]=true;api.complete(f.area,f.deep);save();}},onReturn:(win,fled)=>{
       busy=false;if(!win&&!fled){leave();return false;}if(win||e.kind==='enemy'){f.entities=f.entities.filter(x=>x.id!==e.id);if(e.kind==='enemy')f.respawns.push(f.elapsed+15);if(e.kind==='boss'){f.entities.push(chest(f,{x:33,y:22}),chest(f,{x:67,y:22}),{id:'portal',kind:'portal',x:50,y:12,age:1});}}
       return true;
     }});

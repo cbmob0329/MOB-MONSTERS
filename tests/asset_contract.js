@@ -13,7 +13,7 @@ for(const [n,v] of Object.entries(D.skills)){
   const fallback=M.skillFrames(n,v.element||'無');for(const f of fallback)if(!/^skill2?\//.test(f)||bad(f))throw Error(`bad fallback skill frame ${n}: ${f}`);
 }
 for(const [name,a] of Object.entries(M.area))for(const p of [a.field,a.battle,...a.floors])if(bad(p)||!/^back\//.test(p))throw Error(`bad area asset ${name}: ${p}`);
-if(!A.candidates('enemy/01.png')[0].includes('cbmob0329/MOB-QUEST/main/enemy/01.png'))throw Error('GitHub main is not first candidate');
+if(A.candidates('enemy/01.png')[0]!=='enemy/01.png'||!A.candidates('enemy/01.png').some(p=>p.includes('cbmob0329/MOB-QUEST/main/enemy/01.png')))throw Error('Local-first assets must retain GitHub fallback');
 const game=fs.readFileSync(path.join(root,'js/game.js'),'utf8');if(!game.includes('function startStoryBattle()'))throw Error('story battle entry missing');if(!game.includes('playSkillEffect'))throw Error('skill animation hook missing');
 const original='/mnt/data/MOB-MONSTERS-v0021-MOBSTORY-UI-REBUILD/js/data.js';
 if(fs.existsSync(original)){
