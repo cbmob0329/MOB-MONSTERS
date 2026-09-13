@@ -1,0 +1,35 @@
+/* Dialogue distinguishes a character's voice from narration. */
+.dialogue-box{position:relative;padding:20px;text-align:left;border:1px solid #debd88;border-radius:19px;background:linear-gradient(140deg,#fff8e9,#e9e5ef);color:#292337;box-shadow:0 10px 30px #0004}
+.dialogue-box>small{display:block;color:#765087;font-size:12px;font-weight:800;letter-spacing:.05em;margin-bottom:10px}
+.dialogue-box p{white-space:pre-line;line-height:1.9;font-size:17px;min-height:96px;margin:0;cursor:pointer}
+.opening-spoken .dialogue-box:before,.spoken .dialogue-box:before,.speech:before{content:'';position:absolute;top:-12px;left:calc(50% - 12px);width:22px;height:22px;transform:rotate(45deg);background:#fff8e9;border-top:1px solid #debd88;border-left:1px solid #debd88}
+.opening-narrated .dialogue-box,.narrated .dialogue-box{border:0;border-radius:0;background:linear-gradient(90deg,transparent,#071923b8,transparent);color:#f5eddd;box-shadow:none;text-align:center;padding:30px 14px}
+.opening-narrated .dialogue-box>small,.narrated .dialogue-box>small{color:#c4d6db;font-size:10px;letter-spacing:.22em}
+.opening-narrated.opening-dark .dialogue-box{background:none}.opening-narrated .dialogue-box p{font-size:20px}
+.opening-screen.opening-castle{animation:none}.opening-art .lilith-art,.dialogue-portrait .lilith-art{animation:lilith-breath 3.5s ease-in-out infinite}
+.typing:after{content:'▎';font-size:.8em;opacity:.5}.opening-content .dialogue-box{margin-top:18px}.opening-next{min-height:60px}
+.dialogue-portrait{height:185px;display:flex;justify-content:center;margin-bottom:16px}.dialogue-portrait .lilith-art{position:relative;inset:auto;width:160px;height:185px}
+.dialogue-scene .dialogue-box{margin-bottom:18px}.dialogue-page{display:block;text-align:center;color:#a5b4bc;margin-top:10px}
+.speech{background:linear-gradient(140deg,#fff8e9,#e9e5ef);color:#292337;margin-top:15px}.speech p{color:#292337;min-height:48px;white-space:pre-line}.speech small{color:#765087}
+@keyframes lilith-breath{50%{transform:translateY(-5px)}}
+/* Gate launch, travel streaks, and a warm landing use the same bounded transition. */
+.journey-overlay{background:radial-gradient(ellipse at 50% 60%,#14516a,#06101f 72%)}
+.journey-overlay.return{background:radial-gradient(ellipse at 50% 60%,#635234,#151729 72%)}
+.journey-overlay section>small,.journey-overlay h2,.journey-overlay section>p{position:relative;z-index:3;text-shadow:0 2px 14px #000}
+.journey-horizon{position:absolute;inset:50% -60% -20%;z-index:-2;background:linear-gradient(transparent,#2d91a14d),repeating-linear-gradient(90deg,transparent 0 45px,#73dbea30 46px 47px),repeating-linear-gradient(0deg,transparent 0 45px,#73dbea30 46px 47px);transform:perspective(300px) rotateX(55deg)}
+.journey-orbits{position:absolute;top:51%;left:50%;width:240px;height:240px;transform:translate(-50%,-50%);pointer-events:none;z-index:-1}
+.journey-orbits i{position:absolute;inset:0;border:2px solid #acebfd99;border-radius:50%;box-shadow:0 0 24px #87ddff44}.journey-orbits i:nth-child(2){inset:-25px;border-style:dashed;opacity:.5}.journey-orbits i:nth-child(3){inset:-50px;opacity:.25}
+.journey-checks{display:flex;gap:12px;position:relative;z-index:3;font-size:9px;letter-spacing:.07em;color:#a4ebd7}.journey-checks span{padding:6px;border-bottom:1px solid #a4ebd7;opacity:.25}
+.playing .journey-checks span{animation:link-ready .4s ease forwards}.playing .journey-checks span:nth-child(2){animation-delay:.25s}.playing .journey-checks span:nth-child(3){animation-delay:.5s}
+.playing .journey-orbits{animation:gate-pulse 1.8s ease-out both}.playing .journey-robo{animation:robo-launch 1.9s ease-in both;height:150px;width:170px;filter:drop-shadow(0 0 20px #aee4ff)}.playing .journey-gate{animation-duration:1.95s}.playing .journey-streaks{animation-duration:1.95s}.journey-overlay.arriving{animation-duration:.85s}
+.return.playing .journey-robo{animation:robo-land 1.9s ease-out both}.return .journey-orbits i{border-color:#ffe4a2}.return .journey-checks{color:#ffe4a2}
+@keyframes link-ready{to{opacity:1}}@keyframes gate-pulse{0%{opacity:.2;transform:translate(-50%,-50%) scale(.6)}45%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(3)}}
+@keyframes robo-launch{0%{opacity:0;transform:translateY(70px) scale(.9)}20%,38%{opacity:1;transform:translateY(0) scale(1)}65%{opacity:1;transform:translateY(-50px) scale(.65)}100%{opacity:0;transform:translateY(-130px) scale(.05)}}
+@keyframes robo-land{0%{opacity:0;transform:translateY(-100px) scale(.1)}35%{opacity:1}70%,100%{opacity:1;transform:translateY(0) scale(1)}}
+/* Growth reveal keeps results readable after the animation finishes. */
+.level-up-v35{position:relative;isolation:isolate;overflow:hidden;padding:25px 10px}.level-up-v35 .training-emblem{animation:level-crest 1.2s ease-out both}.level-burst{position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 50% 28%,#ffdc7338,transparent 65%)}
+.level-burst i{position:absolute;width:200px;height:200px;left:calc(50% - 100px);top:20px;border:2px solid #ffe095;border-radius:50%;animation:level-ring 1.5s ease-out both}.level-burst i:nth-child(2){animation-delay:.2s}.level-burst i:nth-child(3){animation-delay:.4s}
+.level-up-v35 .level-route small{font-size:18px;color:#bcc4cf}.level-arrival{display:inline-block;animation:level-number .7s .45s both}.level-awaken{color:#ffe4a0;letter-spacing:.12em}.level-new-skills p{display:grid;gap:6px;padding:12px;background:#173e40;border:1px solid #80c5af;border-radius:10px;animation:level-number .6s .9s both}.level-new-skills small{font-size:10px;color:#a9e9cf}.level-new-skills b{font-size:17px}
+.battle-level-ups{padding:18px;border:1px solid #d6b472;border-radius:16px;background:radial-gradient(ellipse at top,#655129,#172a37);margin:18px 0}.battle-level-ups h2{font-size:20px;color:#ffe1a0}.battle-level-ups article{padding:12px;border-top:1px solid #ffffff20;animation:level-number .65s var(--rise-delay,0s) both}.battle-level-ups p{margin:8px 0}.battle-level-ups span{color:#ffe1a0;font-size:22px;font-weight:800}.battle-level-ups small{display:block;color:#c5e6dc}
+@keyframes level-ring{from{opacity:.8;transform:scale(.3)}to{opacity:0;transform:scale(2)}}@keyframes level-crest{0%{transform:scale(.7);filter:brightness(1)}50%{transform:scale(1.1);filter:brightness(1.7)}100%{transform:scale(1);filter:brightness(1)}}@keyframes level-number{from{opacity:0;transform:translateY(15px) scale(.85)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.opening-art .lilith-art,.dialogue-portrait .lilith-art,.journey-overlay *,.level-up-v35 *,.battle-level-ups article{animation:none!important}.journey-robo{opacity:1!important}.journey-checks span,.level-arrival,.level-new-skills p{opacity:1}.level-burst i{display:none}}

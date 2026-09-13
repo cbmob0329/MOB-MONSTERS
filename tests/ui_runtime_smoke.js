@@ -15,7 +15,7 @@ function makeElement(){
     className:'', onclick:null, onchange:null, oninput:null,
     classList:{add(){},remove(){},toggle(){}},
     addEventListener(){}, insertAdjacentHTML(_where,html){this.innerHTML+=html;}, querySelector(){return makeElement();}, querySelectorAll(){return [];},
-    closest(){return null;}, focus(){}, setAttribute(){},
+    remove(){}, closest(){return null;}, focus(){}, setAttribute(){},
   };
   return el;
 }
@@ -46,6 +46,7 @@ function runScreen(screen){
   vm.runInContext(assetsCode, context, {filename:'assets.js'});
   vm.runInContext(assetMapCode, context, {filename:'asset_map.js'});
   vm.runInContext(dataCode, context, {filename:'data.js'});
+  vm.runInContext(fs.readFileSync(path.join(__dirname,'../js/dialogue.js'),'utf8'), context, {filename:'dialogue.js'});
   vm.runInContext(gameCode, context, {filename:'game.js'});
   if(!get('#screen').innerHTML) throw new Error(`${screen}: screen was not rendered`);
 }

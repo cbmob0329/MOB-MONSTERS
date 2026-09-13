@@ -8,13 +8,13 @@ const {chromium}=require(process.env.PLAYWRIGHT_PATH||'C:/Users/user/.cache/code
  await page.route('**/js/exploration.js*',r=>r.fulfill({contentType:'text/javascript',body:fs.readFileSync('js/exploration.js','utf8').replace('active:()=>!!field','field:()=>field,generateCave,unlocked,interact,active:()=>!!field')}));
  await page.goto('http://127.0.0.1:4173');
  // Actual new game narrative; resume at name input to check save checkpoints.
- await page.locator('#seedBtn').click();assert(await page.locator('#openingNext').isDisabled());assert.equal(await page.locator('#openingSkip').count(),0);await page.waitForTimeout(1050);await page.locator('#openingNext').click();
+ await page.locator('#seedBtn').click();assert(await page.locator('#openingNext').isDisabled());assert.equal(await page.locator('#openingSkip').count(),0);await page.waitForTimeout(1050);await page.locator('#openingNext').click();await page.locator('#openingText').click();
  assert((await page.locator('.opening-content').innerText()).includes('魔王が世界を支配'));
- await page.evaluate(()=>{T.state().opening.index=22;T.save();});await page.reload();await page.locator('#continueGame').click();await page.locator('#openingName').fill('テスト冒険者');await page.locator('#openingDecide').click();assert((await page.locator('.opening-content').innerText()).includes('テスト冒険者'));await page.waitForTimeout(1300);await page.screenshot({path:'tests/screenshots/033-opening.png'});
+ await page.evaluate(()=>{T.state().opening.index=22;T.save();});await page.reload();await page.locator('#continueGame').click();await page.locator('#openingName').fill('テスト冒険者');await page.locator('#openingDecide').click();await page.locator('#openingText').click();assert((await page.locator('.opening-content').innerText()).includes('テスト冒険者'));await page.waitForTimeout(1300);await page.screenshot({path:'tests/screenshots/033-opening.png'});
  let noChecked=false;for(let i=0;i<35&&await page.locator('.opening-screen').count();i++){
   if(await page.locator('#openingName').count()){await page.locator('#openingName').fill('123456789');await page.locator('#openingDecide').click();assert(await page.locator('#openingName').count());await page.locator('#openingName').fill('スラちゃん');await page.locator('#openingDecide').click();}
   else if(await page.locator('#openingYes').count()){if(!noChecked){await page.locator('#openingNo').click();assert(await page.locator('#openingYes').count());noChecked=true;}await page.locator('#openingYes').click();}
-  else await page.locator('#openingNext').click();
+  else {await page.locator('#openingText').click();await page.locator('#openingNext').click();}
  }
  assert.equal(await page.locator('[data-home-mon]').count(),1);assert(await page.evaluate(()=>T.state().flags.roboOwned&&T.state().owned[0].level===5&&T.state().owned[0].nickname==='スラちゃん'));
  // Old saves: retain real souls and collapse only test-created surplus.
