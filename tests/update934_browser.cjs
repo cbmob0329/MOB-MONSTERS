@@ -1,0 +1,21 @@
+const fs=require('fs'),assert=require('assert/strict');
+const {chromium}=require('C:/Users/user/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+(async()=>{const browser=await chromium.launch({channel:'msedge',headless:true});try{
+const page=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+await page.route('**/js/game.js*',r=>r.fulfill({contentType:'text/javascript',body:fs.readFileSync('js/game.js','utf8').replace('renderBattle();runBattle();','renderBattle();').replace(/applyTestV6\(\);\r?\nrender\(\);/,'window.T={state:()=>state,battle:()=>battle,createInstance,startBattle,playerTurn,runBattle,renderBattle,trainingV6,chooseReplacement};applyTestV6();render();')}));
+await page.goto('http://127.0.0.1:4173');
+await page.evaluate(()=>{const s=T.state(),a=T.createInstance('モブスライム',30);s.owned=[a];s.party=[a.uid];s.settings.testMode=true;T.startBattle({title:'AUTO TEST',mode:'exploration',area:'草原',enemyRoster:[{name:'モブスライム',level:120}]});const b=T.battle();b.activeActor=b.allies[0];b.enemies[0].hp=b.enemies[0].maxHp=99999;T.playerTurn(b.activeActor).then(()=>window.done=true);});
+await page.locator('#autoBattleToggle').click();await page.locator('#autoBattleToggle').click();await page.waitForTimeout(650);assert.equal(await page.evaluate(()=>!!window.done),false);
+await page.locator('#autoBattleToggle').click();await page.waitForFunction(()=>T.battle().choiceLock);await page.locator('#autoBattleToggle').click();await page.waitForFunction(()=>window.done);assert(await page.evaluate(()=>T.battle().enemies[0].hp<99999));
+await page.evaluate(()=>{window.done=false;T.playerTurn(T.battle().activeActor).then(()=>window.done=true)});await page.waitForTimeout(700);assert.equal(await page.evaluate(()=>window.done),false);await page.screenshot({path:'tests/screenshots/034-auto.png'});
+await page.locator('#autoBattleToggle').click();await page.waitForFunction(()=>window.done);
+assert(await page.evaluate(async()=>{const b=T.battle(),candidate={uid:'reserve'};return await T.chooseReplacement(0,[candidate])===candidate}));
+await page.evaluate(()=>{T.state().settings.testMode=false;T.renderBattle()});assert.equal(await page.locator('#autoBattleToggle').count(),0);
+const levels=await page.evaluate(()=>{const s=T.state(),a=s.owned[0],r=a.records[0];r.level=1;s.soulPoints=999999;const skills=MOBMON_DATA.records.find(x=>x.name===r.name).milestones.filter(m=>m.type==='SKILL');T.trainingV6(a.uid,r.name,Math.max(1,skills.at(-1).level-1));return skills;});
+assert.equal(await page.locator('.training-skill').count(),levels.length);for(const m of levels)assert((await page.locator('#trainingSkills').innerText()).includes('Lv '+m.level));assert(await page.locator('.training-skill.planned').count()>0);await page.screenshot({path:'tests/screenshots/034-record.png'});
+await page.locator('#levelExecute').click();await page.locator('#answerYes').click();await page.locator('#levelDone').click();assert.equal(await page.locator('.training-skill.locked').count(),0);assert.equal(await page.locator('.training-skill.planned').count(),0);
+await page.locator('#modalClose').click();
+await page.evaluate(()=>{const b=T.battle();T.state().settings.testMode=true;b.autoBattle=true;b.allies[0].mp=9999;b.allies[0].spd=99999;b.enemies[0].hp=1;T.runBattle();});
+await page.locator('#battleResultNext').waitFor({timeout:30000}).catch(async e=>{console.log(errors,await page.evaluate(()=>({log:T.battle().log,finished:T.battle().finished,lock:T.battle().choiceLock,choice:!!T.battle().choiceResolve,modal:document.querySelector('#modal').hidden})));throw e;});assert(await page.evaluate(()=>T.battle().result.win));assert(await page.evaluate(()=>T.battle().allies[0].mp<9999));
+assert.deepEqual(errors,[]);console.log('034: auto toggle/cancellation/in-flight OFF/manual return/replacement/test-only visibility and record learning preview/purchase OK');
+}finally{await browser.close()}})().catch(e=>{console.error(e);process.exitCode=1});
