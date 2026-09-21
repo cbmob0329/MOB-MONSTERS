@@ -1,0 +1,11 @@
+草原用　障害物
+岩A stage/001.png　岩B※Aよりやや大きめ stage/002.png 湖※かなり大き目 stage/003.png
+木※岩よりちょい大き目 stage/004.png
+
+砂漠用　障害物
+枯れ木 stage/006.png　サボテンやや大きめ stage/006.png オアシス※かなり大き目 stage/008.png
+恐竜の骨※大き目 stage/007.png
+
+田舎町用　障害物
+枯れ木 stage/006.png　サボテンやや大きめ stage/006.png オアシス※かなり大き目 stage/008.png
+恐竜の骨※大き目 stage/007.png
