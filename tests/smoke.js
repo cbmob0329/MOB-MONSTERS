@@ -33,7 +33,7 @@ for(const r of D.records){
 }
 assert(D.rankDropRates.F===0.40,'F drop rate');
 assert(D.rankDropRates.SS===0.001,'SS drop rate');
-assert(D.party.main===4&&D.party.super===2&&D.party.reserve===4,'party 4/2/4');
+assert(D.party.main===4&&D.party.super===4&&D.party.reserve===0,'party 4/4');
 assert(D.exp.monsterMaxLevel===99&&D.exp.recordMaxLevel===70,'level caps');
 for(const area of Object.keys(D.areaBoss))for(const lap of ['1','2'])assert(names.has(D.areaBoss[area][lap]),`unknown area boss ${area}/${lap}`);
 const general=[
