@@ -1,0 +1,97 @@
+{
+  "passed": true,
+  "combat": {
+    "animations": [
+      {
+        "uid": "old-uid",
+        "frame": "2"
+      },
+      {
+        "uid": "m_muwtqgsz_1ngxyg9",
+        "frame": "2"
+      },
+      {
+        "uid": "m_muwtqgsz_c7bbsl7",
+        "frame": "2"
+      },
+      {
+        "uid": "m_muwtqgsz_m4lpmru",
+        "frame": "2"
+      },
+      {
+        "uid": "m_muwtqgsz_2vesk43",
+        "frame": "2"
+      },
+      {
+        "uid": "m_muwtqgsz_asmq6wn",
+        "frame": "2"
+      },
+      {
+        "uid": "m_muwtqgsz_7x35zvn",
+        "frame": "2"
+      },
+      {
+        "uid": "m_muwtqgsz_e3wwgl5",
+        "frame": "2"
+      }
+    ],
+    "changes": [
+      49,
+      86,
+      76,
+      76,
+      8,
+      8,
+      7,
+      8
+    ],
+    "healed": 2500,
+    "repeat": true,
+    "fields": false
+  },
+  "fx": {
+    "draws": [
+      [
+        2,
+        268,
+        194,
+        242
+      ],
+      [
+        200,
+        268,
+        308,
+        242
+      ],
+      [
+        512,
+        268,
+        254,
+        242
+      ],
+      [
+        770,
+        268,
+        252,
+        242
+      ]
+    ],
+    "atImpact": "2"
+  },
+  "errors": [],
+  "checks": [
+    "legacy save",
+    "reserve placement",
+    "swap",
+    "same slot",
+    "removal",
+    "cancel",
+    "double click uniqueness",
+    "320/375/390 width",
+    "record skill detail",
+    "enemy all targets damaged",
+    "tea repeat no cooldown",
+    "battle end clears FX",
+    "manifest 4 frames at impact 2"
+  ]
+}

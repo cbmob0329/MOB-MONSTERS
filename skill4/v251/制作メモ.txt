@@ -1,0 +1,8 @@
+v251 新規戦闘アニメーション素材
+生成方法: built-in image_gen、transparent_background=true。
+weapons.png: 剣・大剣・刀・槍・銃・杖・爪、各4コマ。
+elements.png: 火・水・雷・地・風・光・闇・無、各4コマ。
+bosses.png: 薔薇と茨・竜炎・ピラミッド・弾幕・大波・獄炎、各4コマ。
+recovery.png: 回復・強化、各4コマ。
+切り出し座標: frames.json。生成素材には等分からずれたコマがあるため、ゲーム側で座標を指定。
+同名のプレイヤー魔法・特技を敵が使う場合は、既存プレイヤー演出を共用。

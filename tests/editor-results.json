@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "checks": [
+    "file:// offline",
+    "image search",
+    "edit",
+    "undo",
+    "export",
+    "import",
+    "empty value rejection",
+    "unsupported effect draft blocked",
+    "malformed import preserves work"
+  ],
+  "errors": []
+}
