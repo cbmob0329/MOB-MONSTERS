@@ -1,0 +1,93 @@
+{
+  "oldSave": true,
+  "fusion": {
+    "fail": [],
+    "delta": 1,
+    "left": 0,
+    "child": {
+      "uid": "m_muw931sc_g3vtm0g",
+      "name": "モブマカロン",
+      "cassette": 1,
+      "level": 1,
+      "exp": 0,
+      "records": [
+        {
+          "name": "STORY・モブマカロン",
+          "level": 1,
+          "exp": 0
+        },
+        {
+          "name": "戦士",
+          "level": 1,
+          "exp": 0
+        }
+      ],
+      "activeRecord": "STORY・モブマカロン",
+      "lineage": [],
+      "createdAt": 1791265256652
+    },
+    "saved": {
+      "uid": "m_muw931sc_g3vtm0g",
+      "name": "モブマカロン",
+      "cassette": 1,
+      "level": 1,
+      "exp": 0,
+      "records": [
+        {
+          "name": "STORY・モブマカロン",
+          "level": 1,
+          "exp": 0
+        },
+        {
+          "name": "戦士",
+          "level": 1,
+          "exp": 0
+        }
+      ],
+      "activeRecord": "STORY・モブマカロン",
+      "lineage": [],
+      "createdAt": 1791265256652
+    }
+  },
+  "combat": {
+    "first": [
+      0,
+      414,
+      0
+    ],
+    "blocked": false,
+    "again": true,
+    "down": -0.2,
+    "expired": 0,
+    "hp": 10100,
+    "enemyUnchanged": true,
+    "fx": 0,
+    "description": "光 / 敵単体 / MP 18 / 物理 1.65×1 / マヒ 50%（耐性判定前） / 再使用 2ターン後"
+  },
+  "aoe": [
+    50,
+    50,
+    50,
+    50,
+    5,
+    5,
+    5,
+    5
+  ],
+  "allSkillExecutions": 258,
+  "mobile": [
+    {
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "overflow": false
+    }
+  ],
+  "errors": []
+}

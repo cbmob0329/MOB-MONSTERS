@@ -1,0 +1,28 @@
+{
+  "storyVersion": "v257",
+  "storyIndexSha256": "67905c5884543ebb6e279546c4cf06d52e60979437905b7e0a133b121cf1b06d",
+  "monstersOriginalGameSha256": "28b53ae8a9d7a55f8d7304648887efbf8e28d6c65a6257ac0dc2d4a233a9d80f",
+  "libraryId": "libfile_af9fde9095e88191a39ed2107353b140",
+  "libraryFileId": "file_00000000082881fdb37fe9296da9996c",
+  "libraryVersion": 0,
+  "expectedBytes": 941444,
+  "parsedLines": 3933,
+  "sheets": [
+    "敵一覧",
+    "ボス・中ボス一覧",
+    "出現編成",
+    "通常出現候補",
+    "耐性",
+    "魔法",
+    "特技",
+    "必殺技",
+    "習得条件",
+    "プレイヤー",
+    "敵の魔法・特技",
+    "共通ルール",
+    "詳細パラメータ",
+    "使い方"
+  ],
+  "workbookMaterialization": "FAILED: official Python helper requires os.setxattr unavailable on Windows; content read through Library full read",
+  "sourcesReadOnly": true
+}

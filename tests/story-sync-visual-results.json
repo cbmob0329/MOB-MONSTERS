@@ -1,0 +1,16 @@
+{
+  "effectBeforeDamage": true,
+  "exactTarget": true,
+  "cancelledEffectDidNotDamageNewBattle": true,
+  "wins": [
+    {
+      "win": true,
+      "exp": 10
+    },
+    {
+      "win": true,
+      "exp": 10
+    }
+  ],
+  "errors": []
+}
