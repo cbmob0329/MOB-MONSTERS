@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "source": "ユーザー提供 素材集/効果音.txt",
+  "attack": "054.mp3",
+  "impact": "053.mp3",
+  "heal": "038.wav",
+  "buff": "007.mp3",
+  "debuff": {
+    "file": "066.wav",
+    "reason": "008欠番。用途表の状態異常音を使用"
+  },
+  "bgm": {
+    "file": "grassland.mp3",
+    "original": "002.mp3",
+    "area": "草原",
+    "sameRecordingAs": "001.wav",
+    "wavOriginalPreserved": true
+  },
+  "files": [
+    "013.wav",
+    "003.wav",
+    "004.wav",
+    "054.mp3",
+    "053.mp3",
+    "62.wav",
+    "038.wav",
+    "007.mp3",
+    "066.wav",
+    "019.wav",
+    "005.mp3",
+    "006.mp3",
+    "101.wav",
+    "055.mp3",
+    "100.wav",
+    "031.mp3",
+    "037.mp3",
+    "045.wav",
+    "035.mp3",
+    "027.mp3",
+    "049.mp3",
+    "033.mp3",
+    "028.mp3"
+  ],
+  "humanListening": false,
+  "loop": "Decoded AudioBuffer loop, 10ms endpoint fades; musical seam not auditioned"
+}

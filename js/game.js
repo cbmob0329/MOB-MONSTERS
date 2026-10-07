@@ -304,7 +304,7 @@ function actorBarMarkup(a){if(!a)return `<div class="battle-idle-v3"><span><b>BA
 function bindBattleTargetsV3(){
   $$('[data-battle-target]').forEach(el=>el.onclick=()=>{if(!battle?.targetResolve)return;const side=battle.targetSide,list=side==='enemy'?activeEnemies():activeAllies(),target=list.find(x=>x.uid===el.dataset.battleTarget);if(!target)return;const resolve=battle.targetResolve;battle.targetResolve=null;battle.targetSide=null;battle.choiceLock=false;renderBattle();resolve(target);});
 }
-async function battleActionBeat(text,tone='ally',ms=430){if(battle?.activeActor&&(/攻撃| \/ /.test(text)))await approachV29(battle.activeActor);const el=$('#battleMessageV3');if(!el)return;el.textContent=text;el.className=`battle-message-v3 ${tone}`;void el.offsetWidth;el.classList.add('play');await sleep(ms);}
+async function battleActionBeat(text,tone='ally',ms=430){if(/の攻撃！/.test(text))battleAudio('attack');if(battle?.activeActor&&(/攻撃| \/ /.test(text)))await approachV29(battle.activeActor);const el=$('#battleMessageV3');if(!el)return;el.textContent=text;el.className=`battle-message-v3 ${tone}`;void el.offsetWidth;el.classList.add('play');await sleep(ms);}
 async function playSkillEffect(skill,target=null,tone='ally'){
   const sequence=window.MOBMON_SKILL_SEQUENCES?.[skill.name]||(skill.frames||AM.skillFrames?.(skill.name,skill.element)||[]).map(path=>({path,ms:100}));
   if(!sequence.length)return;
@@ -317,7 +317,7 @@ async function playSkillEffect(skill,target=null,tone='ally'){
   const caster=battle?.activeActor,cr=caster?$(`[data-combat-uid="${caster.uid}"]`)?.getBoundingClientRect():null;
   if(cr&&r){wrap.style.setProperty('--source-x',cr.left+cr.width/2-(r.left+r.width/2)+'px');wrap.style.setProperty('--source-y',cr.top+cr.height*.5-(r.top+r.height*.48)+'px');}
   if(r){wrap.style.left=r.left-sr.left+r.width/2+'px';wrap.style.top=r.top-sr.top+r.height*.48+'px';}
-  const img=document.createElement('img');wrap.appendChild(img);layer.appendChild(wrap);
+  const img=document.createElement('img');wrap.appendChild(img);layer.appendChild(wrap);window.MOBMON_PLAY_SKILL_AUDIO?.(skill);
   try{for(const frame of sequence){wrap.className=`skill-fx-912 ${tone} ${frame.motion||''}`;wrap.style.setProperty('--frame-time',frame.ms/(state.settings.battleSpeed||1)+'ms');img.src=window.MOBMON_PRESENT?.ready(frame.path)?.src||frame.path;img.onerror=()=>{img.onerror=null;img.src=AS?.first(frame.path)||frame.path;};const clone=frame.motion==='cross'?img.cloneNode():null;if(clone)wrap.appendChild(clone);void wrap.offsetWidth;await sleep(frame.ms);clone?.remove();}}finally{wrap.remove();}
 }
 
@@ -620,6 +620,28 @@ function migrateStoryV257(s){
  for(const inst of [...s.owned,...Object.values(s.souls||{}).flat().filter(x=>x&&typeof x==='object')]){const m=monsterByName.get(inst.name);if(!m)continue;inst.records||=[];const present=new Set(inst.records.map(r=>r.name));for(const name of m.nativeRecords||[])if(name.startsWith('STORY・')&&!present.has(name)){inst.records.push({name,level:1,exp:0});present.add(name);}}
  s.storySyncVersion=257;return s;
 }
+
+// User recordings: independent preferences; original save schema is untouched.
+const userAudio=createSoundSystem({key:'mob-monsters:user-audio:v1'});userAudio.init();window.MOBMON_SOUND=userAudio;
+let audioScope=userAudio.beginScope('screen');
+function audioStop(){userAudio.endScope(audioScope);userAudio.stopAll();userAudio.setBgm(false);audioScope=userAudio.beginScope('screen');}
+function audioCue(cue,o={}){return userAudio.play(cue,{scope:audioScope,...o});}
+function battleAudio(cue,o={}){if(!battle||battle.finished||state.screen!=='battle')return false;return audioCue(cue,o);}
+window.MOBMON_PLAY_SKILL_AUDIO=s=>battleAudio(s.heal||s.revive?'heal':s.power===0?s.debuff||s.status?'debuff':'buff':s.type==='physical'?'attack':'skill',{attribute:s.element,durationLimit:Math.max(.15,.8/(state.settings.battleSpeed||1))});
+document.addEventListener('pointerdown',()=>{void userAudio.unlock()},{capture:true,passive:true});document.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')void userAudio.unlock()},true);
+document.addEventListener('visibilitychange',()=>document.hidden?userAudio.background():userAudio.foreground());window.addEventListener('pagehide',()=>userAudio.background());
+document.addEventListener('click',e=>{const b=e.target.closest?.('button');if(b&&!b.disabled&&!b.closest('#userAudioSettings'))audioCue('select')},true);
+const audioGo=go;go=function(...a){const before=state.screen,r=audioGo(...a);if(before!==state.screen)audioStop();return r};
+const audioStart=startBattle;startBattle=function(...a){const previous=battle,r=audioStart(...a);if(!previous&&battle){audioStop();audioCue('start');userAudio.setBgm(battle.area==='草原');}return r};
+const audioEnd=endBattleToScreen;endBattleToScreen=function(...a){audioStop();return audioEnd(...a)};
+const audioFinish=finishBattle;finishBattle=async function(win,...a){if(battle&&!battle.finished){audioStop();audioCue(win?'win':'lose')}return audioFinish(win,...a)};
+const audioHit=battleVisualHit;battleVisualHit=function(t,d,c,...a){battleAudio(c?'critical':'hit');return audioHit(t,d,c,...a)};
+const audioSync=syncFx;syncFx=function(s,...a){window.MOBMON_PLAY_SKILL_AUDIO(s);return audioSync(s,...a)};
+const audioStatus=tryStatus;tryStatus=function(a,t,k,...args){const before=t.status[k],r=audioStatus(a,t,k,...args);if(t.status[k]>before)battleAudio('debuff');return r};
+const audioEffect=syncEffect;syncEffect=function(a,k,p,...args){const r=audioEffect(a,k,p,...args);battleAudio(p.elementDown||Object.values(p.stats||{}).some(x=>x<0)?'debuff':'buff');return r};
+const audioPinch=checkPinch;checkPinch=function(a,...args){const hp=a.hp,r=audioPinch(a,...args);if(a.hp>hp)battleAudio('heal');return r};
+const audioDown=enemyDefeatV30;enemyDefeatV30=function(...args){battleAudio('defeat');return audioDown(...args)};
+const audioSettings=settingsV6;settingsV6=function(root){const r=audioSettings(root),s=userAudio.getSettings(),box=document.createElement('section');box.id='userAudioSettings';box.style.cssText='padding:14px;display:grid;gap:10px;border:1px solid #58758b;border-radius:12px';box.innerHTML='<h3>効果音・草原BGM</h3><label>効果音 <input aria-label="効果音音量" data-audio="volume" type="range" min="0" max="100"></label><button data-audio="muted"></button><label>BGM <input aria-label="BGM音量" data-audio="bgmVolume" type="range" min="0" max="100"></label><button data-audio="bgmMuted"></button><button id="audioPreview">効果音を試聴</button><small>ユーザー提供音源。草原戦闘でBGMを再生します。</small>';root.append(box);for(const k of ['volume','bgmVolume']){const e=box.querySelector('[data-audio="'+k+'"]');e.value=Math.round(s[k]*100);e.oninput=()=>userAudio.setSettings({[k]:Number(e.value)/100})}for(const[k,label]of [['muted','効果音'],['bgmMuted','BGM']]){const e=box.querySelector('[data-audio="'+k+'"]');const update=()=>{e.textContent=label+(userAudio.getSettings()[k]?' 消音中':' ON');e.setAttribute('aria-pressed',String(userAudio.getSettings()[k]))};update();e.onclick=()=>{userAudio.setSettings({[k]:!userAudio.getSettings()[k]});void userAudio.unlock();update()}}box.querySelector('#audioPreview').onclick=async()=>{await userAudio.unlock();await userAudio.preload();audioCue('confirm')};return r};
 
 applyTestV6();
 render();
