@@ -1,20 +1,28 @@
 {
-  "version": 1,
-  "source": "ユーザー提供 素材集/効果音.txt",
+  "version": 2,
+  "source": "ユーザー提供 素材集/BGM.txt・sound effect/効果音.txt",
   "attack": "054.mp3",
   "impact": "053.mp3",
   "heal": "038.wav",
   "buff": "007.mp3",
   "debuff": {
-    "file": "066.wav",
-    "reason": "008欠番。用途表の状態異常音を使用"
+    "file": "066.mp3",
+    "reason": "正常履歴版と一致する既存066音をMP3化。原WAV保持"
   },
   "bgm": {
-    "file": "grassland.mp3",
-    "original": "002.mp3",
-    "area": "草原",
-    "sameRecordingAs": "001.wav",
-    "wavOriginalPreserved": true
+    "title": "004",
+    "normalBattle": "010",
+    "eventOrArenaBattle": "009",
+    "specialBossOrLab": "015",
+    "regionalBosses": {
+      "grassland": "002",
+      "rural": "006",
+      "demonCastle": "007",
+      "sea": "008",
+      "desert": "011",
+      "neon": "012"
+    },
+    "arenaLobby": "004"
   },
   "files": [
     "013.wav",
@@ -42,5 +50,136 @@
     "028.mp3"
   ],
   "humanListening": false,
-  "loop": "Decoded AudioBuffer loop, 10ms endpoint fades; musical seam not auditioned"
+  "loop": "WebAudio loop; decoded PCM 80ms end/head overlap; 400ms track crossfade. Musical seam not auditioned.",
+  "previousBgm": {
+    "file": "grassland.mp3",
+    "original": "002.mp3",
+    "area": "草原",
+    "sameRecordingAs": "001.wav",
+    "wavOriginalPreserved": true
+  },
+  "bgmFiles": [
+    {
+      "file": "bgm-002.mp3",
+      "source": "002.mp3",
+      "sha256": "dcfb4a8ce3fc247b32806c4d457e15dbcd827eefbfdabc877f069bf7687211f1",
+      "decode": "FFmpeg full decode passed"
+    },
+    {
+      "file": "bgm-004.mp3",
+      "source": "004.mp3",
+      "sha256": "ad4263162a385ae86aa0dcddca242840b4d2328ab73d4b4d2c1dae0a2452f69d",
+      "decode": "FFmpeg full decode passed"
+    },
+    {
+      "file": "bgm-006.mp3",
+      "source": "006.mp3",
+      "sha256": "72041ef5db17137b1c9849c27bbeed2c8a57bafbf299482e415de17e44b29299",
+      "decode": "FFmpeg full decode passed"
+    },
+    {
+      "file": "bgm-007.mp3",
+      "source": "007.mp3",
+      "sha256": "c2aee2aaaee2ac614d53194bf2ec684d53e413800d3407379099aa3ab37ba2b1",
+      "decode": "FFmpeg full decode passed"
+    },
+    {
+      "file": "bgm-008.mp3",
+      "source": "008.mp3",
+      "sha256": "2ac7c97841f156e1db04f154f0db83e17750c099ac7bde85c99a2f3dc25fb2d0",
+      "decode": "FFmpeg full decode passed"
+    },
+    {
+      "file": "bgm-009.mp3",
+      "source": "009.mp3",
+      "sha256": "dccd13d04c6e0851d8e70de6ea4339c7bbbc87691718f2da4a1fd98b5e56cb03",
+      "decode": "FFmpeg full decode passed"
+    },
+    {
+      "file": "bgm-010.mp3",
+      "source": "010.mp3",
+      "sha256": "ca183f236f16a697bf0613e68e0b6564b8459c3754b9ee49ecd382088f046cd6",
+      "decode": "FFmpeg full decode passed"
+    },
+    {
+      "file": "bgm-011.mp3",
+      "source": "011.mp3",
+      "sha256": "5398cd3a953559a146167e1eff1cd429b1e256e5d5edc34bada6bd93f4940631",
+      "decode": "FFmpeg full decode passed"
+    },
+    {
+      "file": "bgm-012.mp3",
+      "source": "012.mp3",
+      "sha256": "9ba23b20755e8fbd8567af861e218ce25a2a2ab6eedbf63fa6fdb725ecee6137",
+      "decode": "FFmpeg full decode passed"
+    },
+    {
+      "file": "bgm-015.mp3",
+      "source": "015.mp3",
+      "sha256": "0ab42e2c9a8f8e4acbb62e892e255af1963b442d8024592841b75ec8104b0137",
+      "decode": "FFmpeg full decode passed"
+    }
+  ],
+  "seRecovery": {
+    "commit": "a22caa9",
+    "via": "MOB-PIECE-BATTLE verified runtime",
+    "sourceOriginalsRemainDamaged": true,
+    "old066MatchesRecoveredWav": true,
+    "files": [
+      {
+        "source": "素材集/sound effect/052.mp3",
+        "sourceCurrentlyDecodable": false,
+        "currentSourceSha256": "3078cbab742313431c4da971535d7b826df5e15cf0010e34142bd0b9578962f9",
+        "runtime": "public/assets/audio/user-20261007/052.mp3",
+        "runtimeSha256": "d266a799bd41fdd0d789fa6c8121a4be2d22ac1d0392bd5476712315c5a5031a",
+        "recoveryCommit": "a22caa9",
+        "use": "167 ドラゴンブレス",
+        "ourRuntime": "052.mp3",
+        "ourSha256": "d266a799bd41fdd0d789fa6c8121a4be2d22ac1d0392bd5476712315c5a5031a",
+        "decode": "passed"
+      },
+      {
+        "source": "素材集/sound effect/065.wav",
+        "sourceCurrentlyDecodable": false,
+        "currentSourceSha256": "0b1e6e6c5bda0d08a8954b24ac1772a41b2e2ba9f263a96b270ef348eeb9547c",
+        "runtime": "public/assets/audio/user-20261007/065.wav",
+        "runtimeSha256": "51fa23ed881d77d131a36c3424376144a479dfaa5c20af2aaffbc32ab92be518",
+        "recoveryCommit": "a22caa9",
+        "use": "208 地獄の斬撃",
+        "ourRuntime": "065.mp3",
+        "ourSha256": "434f5fb68ae14a08801f8fca8a6d707cbd704e2b088e4f070caf8146eeecdf7d",
+        "decode": "passed"
+      },
+      {
+        "source": "素材集/sound effect/066.wav",
+        "sourceCurrentlyDecodable": false,
+        "currentSourceSha256": "0b1e6e6c5bda0d08a8954b24ac1772a41b2e2ba9f263a96b270ef348eeb9547c",
+        "runtime": "public/assets/audio/user-20261007/066.wav",
+        "runtimeSha256": "876efd7b35a3ffeeffb3f72f6655eaecd103e2d75f206a63b02ea99f0e2943ef",
+        "recoveryCommit": "a22caa9",
+        "use": "debuff skill",
+        "ourRuntime": "066.mp3",
+        "ourSha256": "ffb761d72cc4bc0e983836c216b2f25e2488710ede48dc7579d4b6c46a12c172",
+        "decode": "passed"
+      },
+      {
+        "source": "素材集/sound effect/067.wav",
+        "sourceCurrentlyDecodable": false,
+        "currentSourceSha256": "b27e637eee7b3febce7fda0962b7ce35f6086b2aa18bfdb144aedb7da1867895",
+        "runtime": "public/assets/audio/user-20261007/067.wav",
+        "runtimeSha256": "22c01b46919459062828b3c167e7123451f1d3cb2913bb83f5fc294bdeabed67",
+        "recoveryCommit": "a22caa9",
+        "use": "mq:eventfig/10 ポーションシャワー",
+        "ourRuntime": "067.mp3",
+        "ourSha256": "f0478dd0a7dfcfb752fefa04dd434d8c7f079223be730a6b23fab423d99d042d",
+        "decode": "passed"
+      }
+    ]
+  },
+  "seExtra": {
+    "breath": "052.mp3",
+    "areaSlash": "065.mp3",
+    "status": "066.mp3",
+    "item": "067.mp3"
+  }
 }
