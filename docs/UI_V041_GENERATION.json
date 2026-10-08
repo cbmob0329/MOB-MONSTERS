@@ -1,0 +1,16 @@
+{
+  "mode": "built-in image_gen",
+  "calls": 2,
+  "assets": [
+    {
+      "file": "assets/scenes/room-v041.png",
+      "transparent_background": false,
+      "prompt": "Use case: stylized-concept. Create one production game background for MOB MONSTERS, a warm original cartoon monster-training RPG, no characters. Portrait 1024x1536 composition. A cozy adventurer's personal attic room inside a whimsical medieval cartoon castle: cream plaster upper walls, chunky dark teal outlined oak beams, warm honey wooden floor in strong perspective, softly rounded arched window left rear overlooking green hills and turquoise sky, a deep teal cushion bench below the window, a small ochre rug toward rear right, tiny plain bookshelf at rear right. Foreground center two thirds of floor CLEAR to place separately rendered furniture. Thick confident dark ink outlines, cel shaded 2D hand-painted cartoon, playful rounded shapes, rich but restrained warm amber and petrol blue palette, consistent with collectible monster RPG art, soft sunlight diagonal from left, distinct foreground/midground/background depth. Camera looking gently downward from front, no isometric cutaway. No text, no letters, no logos, no monsters, no collectibles, no trophies, no framed soul records, no interface. Do not depict extra gameplay or currency. Fully finished polished mobile game artwork with readable quiet central area."
+    },
+    {
+      "file": "assets/scenes/fusion-device-v041.png",
+      "transparent_background": true,
+      "prompt": "Use case: stylized-concept. A single isolated Soul Fusion apparatus sprite for an original 2D cartoon monster RPG, TRANSPARENT background. A squat rounded golden bronze pedestal, chunky dark navy ink outlines and clean cel shading. Two small upward cupped side cradles feed swirling cyan and raspberry magical wisps into one large central clear pear-shaped glass chamber, containing a tiny bright warm-white star, no creature, no face. Three-quarter frontal camera, slight top-down view. Whimsical playful premium mobile cartoon, simple readable big shapes, rose crystal inset on base, etched curves, compact substantial silhouette. Warm gold edge highlights, soft teal glow. Entire device fully in frame with generous transparent margins. No environment, no floor, no text or logo, no UI, no labels, no rectangular panel. This is a compositing layer over existing cartoon crimson medieval magic lab artwork. 1024x1024."
+    }
+  ]
+}
