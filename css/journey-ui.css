@@ -50,3 +50,37 @@
 @media(max-width:359px){.journey-home{padding-left:10px!important;padding-right:10px!important}.journey-hero{height:285px}.journey-greeting h1{font-size:19px}.journey-companions .stage-art-v3{height:83px}.journey-companions b{font-size:9px}.journey-adventure{gap:9px;padding:12px}.journey-adventure b{font-size:18px}.journey-shortcuts .journey-link b{font-size:13px}.journey-room-scene{height:390px}.journey-map-window{height:420px}.journey-fusion .fusion-sanctum{height:435px;min-height:435px}.journey-fusion .fusion-intro h2{font-size:17px}.journey-fusion .fusion-source b{font-size:11px}.journey-formation-dock{position:relative;top:0}.journey-party .formation-cell b{font-size:8px}}
 
 .journey-fusion-summary{padding:14px;border:1px solid #b29374;border-radius:14px;background:#293d43;margin-bottom:16px;color:#fff0d0}.journey-fusion-summary small{color:#e8c98d;font-size:12px}.journey-fusion-summary p{font-size:14px;line-height:1.6;margin:8px 0}.journey-fusion-summary strong{font-size:15px}
+
+/* v042: architecture, floor, furniture, light and earned sticker are independent layers. */
+.room-decorator .journey-room-scene{height:440px;isolation:isolate;touch-action:pan-y}
+.room-decorator .journey-room-back,.room-decorator .journey-room-floor{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;pointer-events:none}
+.room-decorator .journey-room-back{z-index:-3;clip-path:inset(0 0 57% 0)}
+.room-decorator .journey-room-floor{z-index:-2;clip-path:inset(43% 0 0 0)}
+.room-decorator .journey-room-scene{background:#b69b70}
+.room-decorator .wall-sage .journey-room-back{filter:hue-rotate(28deg) saturate(.65)}
+.room-decorator .wall-rose .journey-room-back{filter:hue-rotate(325deg) saturate(.7)}
+.room-decorator .floor-walnut .journey-room-floor{filter:brightness(.64) saturate(.8)}
+.room-decorator .floor-ash .journey-room-floor{filter:saturate(.16) brightness(1.12)}
+.room-decorator .dusk .journey-room-back{filter:brightness(.8)}
+.room-decorator .dusk.wall-sage .journey-room-back{filter:hue-rotate(28deg) saturate(.65) brightness(.8)}
+.room-decorator .dusk.wall-rose .journey-room-back{filter:hue-rotate(325deg) saturate(.7) brightness(.8)}
+.room-decorator .journey-room-light{z-index:95;pointer-events:none;background:linear-gradient(125deg,#ffe9a315,transparent 65%)}
+.room-decorator .dusk .journey-room-light{background:linear-gradient(125deg,#f0a75415,#17274777)}
+.room-decorator .journey-room-note{z-index:100;pointer-events:none;font-size:12px}
+.room-decorator .journey-dust{z-index:96;pointer-events:none}
+.room-decorator .journey-keepsake{top:20%;right:12%;width:63px;height:78px;z-index:3}.room-decorator .journey-keepsake .stage-art-v3{height:53px}
+.room-fixture{position:absolute;transform:translate(-50%,-100%);padding:0;border:0;background:transparent;aspect-ratio:1;min-height:44px;touch-action:none;cursor:grab;border-radius:25%;filter:drop-shadow(0 5px 3px #31261744)}
+.room-fixture:active{cursor:grabbing}.room-fixture[hidden]{display:none!important}.room-fixture.is-selected{outline:2px dashed #f4eac1a0;outline-offset:-8px}
+.room-fixture-sprite{display:block;position:absolute;inset:0;background-image:url('../assets/scenes/furniture-atlas-v042.png');background-size:200% 200%;background-repeat:no-repeat;pointer-events:none}
+.fixture-bench .room-fixture-sprite{background-position:0 0}.fixture-shelf .room-fixture-sprite{background-position:100% 0}.fixture-table .room-fixture-sprite{background-position:0 100%}.fixture-rug .room-fixture-sprite{background-position:100% 100%}
+.room-surface-controls{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}.room-surface-controls label{min-width:0;font-size:14px}.room-decorator .journey-room-controls select{font-size:16px}
+.room-decorator h3{font-size:16px;margin:21px 0 10px}.room-fixture-list{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.room-fixture-list button,.room-placement button{font-size:14px;color:#f5ebd0;background:#263f46;border:1px solid #6b837b;border-radius:11px;min-height:44px;padding:9px}
+.room-fixture-list [aria-pressed=true]{color:#223a3c;background:#e8cd91;border-color:#ffecb6}.room-placement{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center;margin-top:13px;padding:13px;background:#203b41;border-radius:14px}.room-placement strong{font-size:15px}.room-move-buttons{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.room-move-buttons button{font-size:22px}.room-decorator .room-sticker-label{margin-top:22px}
+.journey-fusion .fusion-sanctum{background:linear-gradient(#17182833,#17152633),url('../assets/scenes/fusion-room-v042.png') center/cover}
+.journey-fusion-device{top:25%;height:225px}.journey-fusion .fusion-pair{bottom:50px}.journey-fusion .fusion-footnote{font-size:12px}
+.journey-map-world{background-image:linear-gradient(#e4d9ac19,#d3d8ac22),url('../assets/scenes/world-map-v042.png');background-size:100% 100%;background-repeat:no-repeat}
+.journey-map-roads path{stroke:#d1b581;stroke-width:14;stroke-dasharray:none;filter:drop-shadow(0 2px 0 #67533366)}.journey-map-roads path.traveled{stroke:#eee1ad;stroke-width:15}.journey-map-season{background:#e5d8b688;border-radius:6px;padding-left:7px;color:#2d503e;border-bottom-color:#6c805b88;width:calc(100% - 60px)}
+.journey-map-scenery{display:none}.journey-map-node small{background:#f1e7bcbb;border-radius:9px;margin:4px auto 0;width:max-content;padding:1px 8px;color:#29443a}
+@media(max-width:359px){.room-decorator .journey-room-scene{height:390px}.room-fixture-list button{font-size:13px}.room-surface-controls{gap:8px}.room-placement{padding:10px}}
+
+.room-decorator .journey-room-scene{container-type:inline-size}.room-decorator .journey-room-back{clip-path:inset(0 0 calc(50% + 11.3cqw) 0)}.room-decorator .journey-room-floor{clip-path:inset(calc(50% - 11.3cqw) 0 0 0)}
