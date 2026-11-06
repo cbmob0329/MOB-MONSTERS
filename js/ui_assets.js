@@ -3,6 +3,9 @@
  * soulOverrides: optional dedicated soul images keyed by monster name.
  */
 window.MOBMON_UI_ASSETS={
+  heroes:{denden:'',pink:''}, // Finished protagonist art can be assigned here.
+  lilrilith:'', // Falls back to existing chibi art until supplied.
+  robotBodies:{}, // Optional {hopper:{'001':'path',...},shell:{...}} replaces vector art.
   loading:'', // Optional loading-screen background, relative to site root.
   home:'back/002.png',
   lab:'back/003.png',
